@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +19,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        base.Initialize();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -41,8 +44,16 @@ public partial class App : Application
                 DataContext = vm,
                 WindowState = WindowState.Maximized,
             };
+        }else if (ApplicationLifetime is ISingleViewApplicationLifetime single)
+        {
+            single.MainView = new MainView
+            {
+                DataContext = vm
+            };
         }
-
+        
+        var t=AssetLoader.Open(new Uri($"avares://{Assembly.GetExecutingAssembly().FullName}/Assets/sth.zip"));
+        ZipExtractor.ExtractZipStream(t,AppContext.BaseDirectory);
         base.OnFrameworkInitializationCompleted();
     }
 }

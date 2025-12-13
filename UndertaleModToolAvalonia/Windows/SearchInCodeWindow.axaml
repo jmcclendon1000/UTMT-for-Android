@@ -5,7 +5,7 @@
         xmlns:l="clr-namespace:UndertaleModToolAvalonia"
         mc:Ignorable="d"
         x:Class="UndertaleModToolAvalonia.SearchInCodeWindow"
-        x:DataType="l:SearchInCodeViewModel"
+        x:DataType="l:SearchInCodeWindowModel"
         Title="Search in code"
         Width="800"
         Height="400"

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -20,8 +21,13 @@ using System.Threading.Tasks;
 namespace UndertaleModTool
 {
     // Adding misc. scripting functions here
+   [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods |
+                                DynamicallyAccessedMemberTypes.PublicProperties |
+                                DynamicallyAccessedMemberTypes.PublicEvents |
+                                DynamicallyAccessedMemberTypes.PublicConstructors)]
     public partial class MainWindow : Window, INotifyPropertyChanged, IScriptInterface
     {
+        [DynamicDependency("DecompilerSettings", "ToolInfo", "UndertaleModLib")]
         public bool RunUMTScript(string path)
         {
             // By Grossley
@@ -44,6 +50,7 @@ namespace UndertaleModTool
                 scriptDialog.PreventClose = true;
             }
         }
+        
         public bool LintUMTScript(string path)
         {
             // By Grossley

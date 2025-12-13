@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -41,21 +42,17 @@ public partial class MainViewModel
     public Scripting Scripting = null!;
 
     // Window
-    public string Title => $"UndertaleModToolAvalonia - v" +
-        (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?.?.?.?") +
-        $"{(Data?.GeneralInfo is not null ? " - " + Data.GeneralInfo.ToString() : "")}" +
-        $"{(DataPath is not null ? " [" + DataPath + "]" : "")}";
+    public string Title => $"UTMAUnlimited - 秋冥 - v" +
+                           (Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?.?.?.?") +
+                           $"{(Data?.GeneralInfo is not null ? " - " + Data.GeneralInfo.ToString() : "")}" +
+                           $"{(DataPath is not null ? " [" + DataPath + "]" : "")}";
 
-    [Notify]
-    private bool _IsEnabled = true;
+    [Notify] private bool _IsEnabled = true;
 
     // Data
-    [Notify]
-    private UndertaleData? _Data;
-    [Notify]
-    private string? _DataPath;
-    [Notify]
-    private (uint Major, uint Minor, uint Release, uint Build) _DataVersion;
+    [Notify] private UndertaleData? _Data;
+    [Notify] private string? _DataPath;
+    [Notify] private (uint Major, uint Minor, uint Release, uint Build) _DataVersion;
 
     IReadOnlyList<FilePickerFileType> dataFileTypes =
     [
@@ -72,18 +69,16 @@ public partial class MainViewModel
     // Tree data grid
     public partial class TreeDataGridItem
     {
-        [Notify]
-        private string _Text = "<unset text!>";
+        [Notify] private string _Text = "<unset text!>";
         public object? Value { get; set; }
         public object? Tag { get; set; }
-        [Notify]
-        private IList<TreeDataGridItem>? _Children;
+        [Notify] private IList<TreeDataGridItem>? _Children;
     }
 
-    [Notify]
-    private ObservableCollection<TreeDataGridItem> _TreeDataGridData = [];
+    [Notify] private ObservableCollection<TreeDataGridItem> _TreeDataGridData = [];
 
     public BehaviorSubject<string> filterTextSubject = new("");
+
     public string FilterText
     {
         get { return filterTextSubject.Value; }
@@ -93,16 +88,12 @@ public partial class MainViewModel
     // Tabs
     public ObservableCollection<TabItemViewModel> Tabs { get; set; }
 
-    [Notify]
-    private TabItemViewModel? _TabSelected;
-    [Notify]
-    private int _TabSelectedIndex;
-    [Notify]
-    private string _TabSelectedResourceIdString = "None";
+    [Notify] private TabItemViewModel? _TabSelected;
+    [Notify] private int _TabSelectedIndex;
+    [Notify] private string _TabSelectedResourceIdString = "None";
 
     // Command text box
-    [Notify]
-    private string _CommandTextBoxText = "";
+    [Notify] private string _CommandTextBoxText = "";
 
     // Image cache
     public ImageCache ImageCache = new();
@@ -114,13 +105,18 @@ public partial class MainViewModel
     {
         ServiceProvider = serviceProvider ?? App.Services;
 
-        Tabs = [
+        Tabs =
+        [
             new TabItemViewModel(new DescriptionViewModel(
-                "Welcome to UndertaleModTool!",
-                "Open a data.win file to get started, then double click on the items on the left to view them."),
+                    "欢迎",
+                    "欢迎使用秋冥特制版本的Undertale Mod Tool！\n\n本项目基于Undertale Mod Tool Avalonia、GUTMT4A等项目开发\n\n哔哩哔哩:秋冥散雨_GenOuka"),
                 isSelected: true),
         ];
+
+        Me = this;
     }
+
+    public static MainViewModel Me;
 
     public void Initialize()
     {
@@ -134,6 +130,7 @@ public partial class MainViewModel
         {
             await ShowMessageDialog(message);
         }
+
         LazyErrorMessages.Clear();
 
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -199,6 +196,7 @@ public partial class MainViewModel
                         .Subscribe();
                     return readOnlyCollection;
                 }
+
                 return null;
             }
 
@@ -206,64 +204,138 @@ public partial class MainViewModel
             {
                 Value = Data,
                 Text = "Data",
-                Children = [
-                    new() {Value = "GeneralInfo", Text = "General info"},
-                    new() {Value = "GlobalInitScripts", Text = "Global init scripts"},
-                    new() {Value = "GameEndScripts", Text = "Game End scripts"},
-                    new() {Tag = "list", Value = "AudioGroups", Text = "Audio groups",
-                        Children = MakeChildren(Data.AudioGroups)},
-                    new() {Tag = "list", Value = "Sounds", Text = "Sounds",
-                        Children = MakeChildren(Data.Sounds)},
-                    new() {Tag = "list", Value = "Sprites", Text = "Sprites",
-                        Children = MakeChildren(Data.Sprites)},
-                    new() {Tag = "list", Value = "Backgrounds", Text = "Backgrounds & Tile sets",
-                        Children = MakeChildren(Data.Backgrounds)},
-                    new() {Tag = "list", Value = "Paths", Text = "Paths",
-                        Children = MakeChildren(Data.Paths)},
-                    new() {Tag = "list", Value = "Scripts", Text = "Scripts",
-                        Children = MakeChildren(Data.Scripts)},
-                    new() {Tag = "list", Value = "Shaders", Text = "Shaders",
-                        Children = MakeChildren(Data.Shaders)},
-                    new() {Tag = "list", Value = "Fonts", Text = "Fonts",
-                        Children = MakeChildren(Data.Fonts)},
-                    new() {Tag = "list", Value = "Timelines", Text = "Timelines",
-                        Children = MakeChildren(Data.Timelines)},
-                    new() {Tag = "list", Value = "GameObjects", Text = "Game objects",
-                        Children = MakeChildren(Data.GameObjects)},
-                    new() {Tag = "list", Value = "Rooms", Text = "Rooms",
-                        Children = MakeChildren(Data.Rooms)},
-                    new() {Tag = "list", Value = "Extensions", Text = "Extensions",
-                        Children = MakeChildren(Data.Extensions)},
-                    new() {Tag = "list", Value = "TexturePageItems", Text = "Texture page items",
-                        Children = MakeChildren(Data.TexturePageItems)},
-                    new() {Tag = "list", Value = "Code", Text = "Code",
-                        Children = MakeChildren(Data.Code)},
-                    new() {Tag = "list", Value = "Variables", Text = "Variables",
-                        Children = MakeChildren(Data.Variables)},
-                    new() {Tag = "list", Value = "Functions", Text = "Functions",
-                        Children = MakeChildren(Data.Functions)},
-                    new() {Tag = "list", Value = "CodeLocals", Text = "Code locals",
-                        Children = MakeChildren(Data.CodeLocals)},
-                    new() {Tag = "list", Value = "Strings", Text = "Strings",
-                        Children = MakeChildren(Data.Strings)},
-                    new() {Tag = "list", Value = "EmbeddedTextures", Text = "Embedded textures",
-                        Children = MakeChildren(Data.EmbeddedTextures)},
-                    new() {Tag = "list", Value = "EmbeddedAudio", Text = "Embedded audio",
-                        Children = MakeChildren(Data.EmbeddedAudio)},
-                    new() {Tag = "list", Value = "TextureGroupInformation", Text = "Texture group information",
-                        Children = MakeChildren(Data.TextureGroupInfo)},
-                    new() {Tag = "list", Value = "EmbeddedImages", Text = "Embedded images",
-                        Children = MakeChildren(Data.EmbeddedImages)},
-                    new() {Tag = "list", Value = "ParticleSystems", Text = "Particle systems",
-                        Children = MakeChildren(Data.ParticleSystems)},
-                    new() {Tag = "list", Value = "ParticleSystemEmitters", Text = "Particle system emitters",
-                        Children = MakeChildren(Data.ParticleSystemEmitters)},
+                Children =
+                [
+                    new() { Value = "GeneralInfo", Text = "General info" },
+                    new() { Value = "GlobalInitScripts", Text = "Global init scripts" },
+                    new() { Value = "GameEndScripts", Text = "Game End scripts" },
+                    new()
+                    {
+                        Tag = "list", Value = "AudioGroups", Text = "Audio groups",
+                        Children = MakeChildren(Data.AudioGroups)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Sounds", Text = "Sounds",
+                        Children = MakeChildren(Data.Sounds)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Sprites", Text = "Sprites",
+                        Children = MakeChildren(Data.Sprites)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Backgrounds", Text = "Backgrounds & Tile sets",
+                        Children = MakeChildren(Data.Backgrounds)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Paths", Text = "Paths",
+                        Children = MakeChildren(Data.Paths)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Scripts", Text = "Scripts",
+                        Children = MakeChildren(Data.Scripts)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Shaders", Text = "Shaders",
+                        Children = MakeChildren(Data.Shaders)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Fonts", Text = "Fonts",
+                        Children = MakeChildren(Data.Fonts)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Timelines", Text = "Timelines",
+                        Children = MakeChildren(Data.Timelines)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "GameObjects", Text = "Game objects",
+                        Children = MakeChildren(Data.GameObjects)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Rooms", Text = "Rooms",
+                        Children = MakeChildren(Data.Rooms)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Extensions", Text = "Extensions",
+                        Children = MakeChildren(Data.Extensions)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "TexturePageItems", Text = "Texture page items",
+                        Children = MakeChildren(Data.TexturePageItems)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Code", Text = "Code",
+                        Children = MakeChildren(Data.Code)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Variables", Text = "Variables",
+                        Children = MakeChildren(Data.Variables)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Functions", Text = "Functions",
+                        Children = MakeChildren(Data.Functions)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "CodeLocals", Text = "Code locals",
+                        Children = MakeChildren(Data.CodeLocals)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "Strings", Text = "Strings",
+                        Children = MakeChildren(Data.Strings)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "EmbeddedTextures", Text = "Embedded textures",
+                        Children = MakeChildren(Data.EmbeddedTextures)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "EmbeddedAudio", Text = "Embedded audio",
+                        Children = MakeChildren(Data.EmbeddedAudio)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "TextureGroupInformation", Text = "Texture group information",
+                        Children = MakeChildren(Data.TextureGroupInfo)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "EmbeddedImages", Text = "Embedded images",
+                        Children = MakeChildren(Data.EmbeddedImages)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "ParticleSystems", Text = "Particle systems",
+                        Children = MakeChildren(Data.ParticleSystems)
+                    },
+                    new()
+                    {
+                        Tag = "list", Value = "ParticleSystemEmitters", Text = "Particle system emitters",
+                        Children = MakeChildren(Data.ParticleSystemEmitters)
+                    },
                 ]
             });
         }
     }
 
-    public async Task<MessageWindow.Result> ShowMessageDialog(string message, string? title = null, bool ok = true, bool yes = false, bool no = false, bool cancel = false)
+    public async Task<MessageWindow.Result> ShowMessageDialog(string message, string? title = null, bool ok = true,
+        bool yes = false, bool no = false, bool cancel = false)
     {
         return await View!.MessageDialog(message, title, ok, yes, no, cancel);
     }
@@ -322,18 +394,15 @@ public partial class MainViewModel
                         hadImportantWarnings = true;
                     }
                 },
-                (string message) =>
-                {
-                    Dispatcher.UIThread.Post(() => w.SetText($"Opening data file... {message}"));
-                })
+                (string message) => { Dispatcher.UIThread.Post(() => w.SetText($"Opening data file... {message}")); })
             );
 
             if (warnings.Count > 0)
             {
                 w.EnsureShown();
                 await ShowMessageDialog($"Warnings occurred when loading the data file:\n\n" +
-                    $"{(hadImportantWarnings ? "Data loss will likely occur when trying to save.\n" : "")}" +
-                    $"{String.Join("\n", warnings)}");
+                                        $"{(hadImportantWarnings ? "Data loss will likely occur when trying to save.\n" : "")}" +
+                                        $"{String.Join("\n", warnings)}");
             }
 
             // TODO: Add other checks for possible stuff.
@@ -345,7 +414,8 @@ public partial class MainViewModel
         catch (Exception e)
         {
             w.EnsureShown();
-            await ShowMessageDialog($"Error opening data file: {e.Message}");
+            Console.WriteLine(e);
+            await ShowMessageDialog($"Error opening data file: {e.Message} \n {e.StackTrace}");
 
             return false;
         }
@@ -365,10 +435,8 @@ public partial class MainViewModel
 
         try
         {
-            await Task.Run(() => UndertaleIO.Write(stream, Data, message =>
-            {
-                Dispatcher.UIThread.Post(() => w.SetText($"Saving data file... {message}"));
-            }));
+            await Task.Run(() => UndertaleIO.Write(stream, Data,
+                message => { Dispatcher.UIThread.Post(() => w.SetText($"Saving data file... {message}")); }));
 
             return true;
         }
@@ -407,14 +475,16 @@ public partial class MainViewModel
 
     public void UpdateVersion()
     {
-        DataVersion = Data is not null && Data.GeneralInfo is not null ? (Data.GeneralInfo.Major, Data.GeneralInfo.Minor, Data.GeneralInfo.Release, Data.GeneralInfo.Build) : default;
+        DataVersion = Data is not null && Data.GeneralInfo is not null
+            ? (Data.GeneralInfo.Major, Data.GeneralInfo.Minor, Data.GeneralInfo.Release, Data.GeneralInfo.Build)
+            : default;
     }
 
     private void DataGeneralInfoChangedHandler(object? sender, PropertyChangedEventArgs e)
     {
         if (Data is not null && e.PropertyName is
-            nameof(UndertaleGeneralInfo.Major) or nameof(UndertaleGeneralInfo.Minor) or
-            nameof(UndertaleGeneralInfo.Release) or nameof(UndertaleGeneralInfo.Build))
+                nameof(UndertaleGeneralInfo.Major) or nameof(UndertaleGeneralInfo.Minor) or
+                nameof(UndertaleGeneralInfo.Release) or nameof(UndertaleGeneralInfo.Build))
         {
             UpdateVersion();
         }
@@ -504,7 +574,8 @@ public partial class MainViewModel
         var files = await View!.OpenFileDialog(new FilePickerOpenOptions()
         {
             Title = "Run script",
-            FileTypeFilter = [
+            FileTypeFilter =
+            [
                 new FilePickerFileType("C# scripts (.csx)")
                 {
                     Patterns = ["*.csx"],
@@ -527,6 +598,17 @@ public partial class MainViewModel
         }
 
         string? filePath = files[0].TryGetLocalPath();
+        if (filePath == null)
+        {
+            var t = files[0].Path.AbsolutePath;
+            if (t.StartsWith("/document/primary%3A"))
+            {
+                
+                t="/sdcard/"+System.Web.HttpUtility.UrlDecode(t.Substring("/document/primary%3A".Length));
+            }
+            if (File.Exists(t)) filePath = t;
+        }
+
         await Scripting.RunScript(text, filePath);
 
         CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "Script"} finished!";
@@ -534,13 +616,15 @@ public partial class MainViewModel
 
     public async void HelpGitHub()
     {
-        await View!.LaunchUriAsync(new Uri("https://github.com/UnderminersTeam/UndertaleModTool"));
+        await View!.LaunchUriAsync(new Uri("https://github.com/QiumingOrg/"));
     }
 
     public async void HelpAbout()
     {
-        await ShowMessageDialog($"UndertaleModTool v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?.?.?.?"} " +
-            $"by the Underminers team\nLicensed under the GNU General Public License Version 3.", title: "About");
+        await ShowMessageDialog(
+            $"UndertaleModTool v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "?.?.?.?"} " +
+            $"by the Underminers team\n秋冥散雨_GenOuka 二次开发\nLicensed under the GNU General Public License Version 3.",
+            title: "关于");
     }
 
     public async void DataItemAdd(IList list)
@@ -575,7 +659,8 @@ public partial class MainViewModel
 
             if (!IsValidAssetIdentifier(name))
             {
-                await ShowMessageDialog($"Asset name \"{name}\" is not a valid identifier. Only letters, digits and underscore allowed, and it must not start with a digit.");
+                await ShowMessageDialog(
+                    $"Asset name \"{name}\" is not a valid identifier. Only letters, digits and underscore allowed, and it must not start with a digit.");
                 return;
             }
         }
@@ -584,7 +669,8 @@ public partial class MainViewModel
 
         if (res is UndertaleRoom room)
         {
-            if (await ShowMessageDialog("Add the new room to the end of the room order list?", ok: false, yes: true, no: true) == MessageWindow.Result.Yes)
+            if (await ShowMessageDialog("Add the new room to the end of the room order list?", ok: false, yes: true,
+                    no: true) == MessageWindow.Result.Yes)
                 Data.GeneralInfo?.RoomOrder.Add(new(room));
         }
 
@@ -605,8 +691,10 @@ public partial class MainViewModel
         {
             DescriptionViewModel vm => vm,
             "GeneralInfo" => new GeneralInfoViewModel(Data),
-            "GlobalInitScripts" => new GlobalInitScriptsViewModel((Data.GlobalInitScripts as ObservableCollection<UndertaleGlobalInit>)!),
-            "GameEndScripts" => new GameEndScriptsViewModel((Data.GameEndScripts as ObservableCollection<UndertaleGlobalInit>)!),
+            "GlobalInitScripts" => new GlobalInitScriptsViewModel(
+                (Data.GlobalInitScripts as ObservableCollection<UndertaleGlobalInit>)!),
+            "GameEndScripts" => new GameEndScriptsViewModel(
+                (Data.GameEndScripts as ObservableCollection<UndertaleGlobalInit>)!),
             UndertaleAudioGroup r => new UndertaleAudioGroupViewModel(r),
             UndertaleSound r => new UndertaleSoundViewModel(r),
             UndertaleSprite r => new UndertaleSpriteViewModel(r),

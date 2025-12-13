@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +18,9 @@ using Underanalyzer.Decompiler;
 using UndertaleModLib;
 using UndertaleModLib.Decompiler;
 using UndertaleModLib.Models;
-using UndertaleModLib.Scripting;
+using UndertaleModLib.Scripting;
+using UndertaleModLib.Util;
+
 namespace UndertaleModToolAvalonia;
 
 public class Scripting
@@ -51,6 +55,12 @@ public class Scripting
                 .AddReferences(
                     "System.Core",
                     "UndertaleModLib")
+                .AddReferences(typeof(UndertaleObject).GetTypeInfo().Assembly,
+                    GetType().GetTypeInfo().Assembly,
+                    typeof(System.Text.RegularExpressions.Regex).GetTypeInfo().Assembly,
+                    typeof(TextureWorker).GetTypeInfo().Assembly,
+                    typeof(ImageMagick.MagickImage).GetTypeInfo().Assembly,
+                    typeof(Underanalyzer.Decompiler.DecompileContext).Assembly)
                 .WithFilePath(filePath)
                 .WithFileEncoding(Encoding.Default)
                 .WithEmitDebugInformation(true),
@@ -62,7 +72,7 @@ public class Scripting
             if (errors.Any())
             {
                 string message = String.Join("\n", errors);
-                await MainVM.ShowMessageDialog(message, title: "Script compilation error");
+                await MainVM.ShowMessageDialog(message, title: "脚本编译错误");
 
                 return null;
             }
@@ -76,11 +86,11 @@ public class Scripting
             }
             catch (ScriptException e)
             {
-                await MainVM.ShowMessageDialog(e.Message, title: "Error from script");
+                await MainVM.ShowMessageDialog(e.Message, title: "脚本错误");
             }
             catch (Exception e)
             {
-                await MainVM.ShowMessageDialog(e.ToString(), title: "Script execution error");
+                await MainVM.ShowMessageDialog(e.ToString(), title: "脚本执行错误");
             }
         }
         finally
@@ -236,9 +246,10 @@ public class ScriptGlobals : IScriptInterface
 
     public string? PromptChooseDirectory()
     {
+        
         IReadOnlyList<IStorageFolder> folders = Task.Run(() => mainVM.View!.OpenFolderDialog(new()
         {
-            Title = "Select directory",
+            Title = "Select directory"
         })).Result;
 
         if (folders.Count != 1)

@@ -24,7 +24,7 @@ public partial class SearchInCodeWindow : Window
 
     private void TextBox_KeyDown_Tunnel(object? sender, KeyEventArgs e)
     {
-        if (DataContext is SearchInCodeViewModel vm)
+        if (DataContext is SearchInCodeWindowModel vm)
             if (e.Key == Key.Enter && !e.KeyModifiers.HasFlag(KeyModifiers.Shift))
             {
                 e.Handled = true;
@@ -34,16 +34,16 @@ public partial class SearchInCodeWindow : Window
 
     private void DataGrid_DoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (DataContext is SearchInCodeViewModel vm)
+        if (DataContext is SearchInCodeWindowModel vm)
             if (e.Source is Control control)
-                if (control.DataContext is SearchInCodeViewModel.SearchResult searchResult)
+                if (control.DataContext is SearchInCodeWindowModel.SearchResult searchResult)
                     vm.OpenSearchResult(searchResult);
     }
 
     private void DataGrid_KeyDown_Tunnel(object? sender, KeyEventArgs e)
     {
-        if (DataContext is SearchInCodeViewModel vm)
-            if (ResultsDataGrid.SelectedItem is SearchInCodeViewModel.SearchResult searchResult)
+        if (DataContext is SearchInCodeWindowModel vm)
+            if (ResultsDataGrid.SelectedItem is SearchInCodeWindowModel.SearchResult searchResult)
                 if (e.Key == Key.Enter)
                 {
                     e.Handled = true;
@@ -53,17 +53,17 @@ public partial class SearchInCodeWindow : Window
 
     private void DataGridRow_Open_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is SearchInCodeViewModel vm)
+        if (DataContext is SearchInCodeWindowModel vm)
             if (e.Source is Control control)
-                if (control.DataContext is SearchInCodeViewModel.SearchResult searchResult)
+                if (control.DataContext is SearchInCodeWindowModel.SearchResult searchResult)
                     vm.OpenSearchResult(searchResult);
     }
 
     private void DataGridRow_OpenInNewTab_Click(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is SearchInCodeViewModel vm)
+        if (DataContext is SearchInCodeWindowModel vm)
             if (e.Source is Control control)
-                if (control.DataContext is SearchInCodeViewModel.SearchResult searchResult)
+                if (control.DataContext is SearchInCodeWindowModel.SearchResult searchResult)
                     vm.OpenSearchResult(searchResult, inNewTab: true);
     }
 }

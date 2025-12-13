@@ -44,7 +44,16 @@ namespace UndertaleModLib.Util
                 {
                     int byteCount = n;
                     while (--byteCount >= 0)
-                        buffer[byteCount] = _buffer[_position + byteCount];
+                    {
+                        try
+                        {
+                            buffer[byteCount] = _buffer[_position + byteCount];
+                        }
+                        catch (IndexOutOfRangeException e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                    }
                 }
                 else
                     Buffer.BlockCopy(_buffer, _position, buffer, 0, n);

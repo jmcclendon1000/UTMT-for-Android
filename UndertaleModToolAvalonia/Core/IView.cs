@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Platform.Storage;
+using Prism.Commands;
 
 namespace UndertaleModToolAvalonia;
 
@@ -36,20 +39,156 @@ public interface IView
         return await topLevel.Launcher.LaunchUriAsync(uri);
     }
 
-    public async Task<MessageWindow.Result> MessageDialog(string message, string? title = null, bool ok = true, bool yes = false, bool no = false, bool cancel = false)
+    public async Task<MessageWindow.Result> MessageDialog(string message, string? title = null, bool ok = true,
+        bool yes = false, bool no = false, bool cancel = false)
     {
+        if (OperatingSystem.IsAndroid())
+        {
+            return await CommonDialog(message, title, ok, yes, no, cancel);
+        }
+
         Window window = View.FindLogicalAncestorOfType<Window>() ?? throw new InvalidOperationException();
         return await new MessageWindow(message, title, ok, yes, no, cancel).ShowDialog<MessageWindow.Result>(window);
     }
 
-    public async Task<string?> TextBoxDialog(string message, string text = "", string? title = null, bool isMultiline = false, bool isReadOnly = false)
+    private async Task<MessageWindow.Result> CommonDialog(string message, string? title = null, bool ok = true,
+        bool yes = false, bool no = false, bool cancel = false)
     {
+        TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+        View.Find<StackPanel>("TextInputBox").IsVisible = true;
+        View.Find<TextBlock>("TitleText").Text = title ?? "对话框";
+        View.Find<TextBlock>("MessageText").Text = message;
+        View.Find<TextBox>("TextTextBox").Text = "";
+
+        View.Find<Button>("ButtonOk").IsVisible = ok;
+        View.Find<Button>("ButtonCancel").IsVisible = cancel;
+        View.Find<Button>("ButtonYes").IsVisible = yes;
+        View.Find<Button>("ButtonNo").IsVisible = no;
+        View.Find<TextBox>("TextTextBox").IsVisible = false;
+        View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsVisible = false;
+
+        View.Find<Button>("ButtonOk").Click += OnClickOk;
+        View.Find<Button>("ButtonCancel").Click += OnClickCancel;
+        View.Find<Button>("ButtonYes").Click += OnClickYes;
+        View.Find<Button>("ButtonNo").Click += OnClickNo;
+
+        void OnClickOk(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(1);
+            finishBinding();
+        }
+
+        void OnClickCancel(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(2);
+            finishBinding();
+        }
+
+        void OnClickYes(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(3);
+            finishBinding();
+        }
+
+        void OnClickNo(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(4);
+            finishBinding();
+        }
+
+        void finishBinding()
+        {
+            View.Find<Button>("ButtonOk").Click -= OnClickOk;
+            View.Find<Button>("ButtonCancel").Click -= OnClickCancel;
+            View.Find<Button>("ButtonYes").Click -= OnClickYes;
+            View.Find<Button>("ButtonNo").Click -= OnClickNo;
+            View.Find<StackPanel>("TextInputBox").IsVisible = false;
+        }
+
+        int a = await tcs.Task;
+        switch (a)
+        {
+            case 1:
+                return MessageWindow.Result.OK;
+            case 2:
+                return MessageWindow.Result.Cancel;
+            case 3:
+                return MessageWindow.Result.Yes;
+            case 4:
+                return MessageWindow.Result.No;
+            default:
+                return MessageWindow.Result.Cancel;
+        }
+    }
+
+    private async Task<String> CommonTextDialog(string message, string? title, string? textdef)
+    {
+        TaskCompletionSource<int> tcs = new TaskCompletionSource<int>();
+        View.Find<StackPanel>("TextInputBox").IsVisible = true;
+        View.Find<TextBlock>("TitleText").Text = title ?? "文本输入框";
+        View.Find<TextBlock>("MessageText").Text = message;
+        View.Find<TextBox>("TextTextBox").Text = textdef ?? "";
+
+        View.Find<Button>("ButtonOk").IsVisible = true;
+        View.Find<Button>("ButtonCancel").IsVisible = true;
+        View.Find<Button>("ButtonYes").IsVisible = false;
+        View.Find<Button>("ButtonNo").IsVisible = false;
+        View.Find<TextBox>("TextTextBox").IsVisible = true;
+        View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsVisible = false;
+
+        View.Find<Button>("ButtonOk").Click += OnClickOk;
+        View.Find<Button>("ButtonCancel").Click += OnClickCancel;
+
+        void OnClickOk(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(1);
+            finishBinding();
+        }
+
+        void OnClickCancel(object? sender, RoutedEventArgs e)
+        {
+            tcs.SetResult(2);
+            finishBinding();
+        }
+
+        void finishBinding()
+        {
+            View.Find<Button>("ButtonOk").Click -= OnClickOk;
+            View.Find<Button>("ButtonCancel").Click -= OnClickCancel;
+            View.Find<StackPanel>("TextInputBox").IsVisible = false;
+        }
+
+        int a = await tcs.Task;
+        switch (a)
+        {
+            case 1:
+                return View.Find<TextBox>("TextTextBox").Text;
+            case 2:
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    public async Task<string?> TextBoxDialog(string message, string text = "", string? title = null,
+        bool isMultiline = false, bool isReadOnly = false)
+    {
+        if (OperatingSystem.IsAndroid())
+        {
+            return await CommonTextDialog(message, title, text);
+        }
+
         Window window = View.FindLogicalAncestorOfType<Window>() ?? throw new InvalidOperationException();
         return await new TextBoxWindow(message, text, title, isMultiline, isReadOnly).ShowDialog<string?>(window);
     }
 
     public ILoaderWindow LoaderOpen()
     {
+        if (OperatingSystem.IsAndroid())
+        {
+            return new LoaderWindow.LoaderWindowDroid(View);
+        }
+
         Window window = View.FindLogicalAncestorOfType<Window>() ?? throw new InvalidOperationException();
         LoaderWindow loaderWindow = new();
         loaderWindow.ShowDelayed(window);
@@ -58,6 +197,14 @@ public interface IView
 
     public async Task SettingsDialog()
     {
+        if (OperatingSystem.IsAndroid())
+        {
+            TabItemViewModel tab = new(new SettingsViewModel());
+            MainViewModel.Me.Tabs.Add(tab);
+            MainViewModel.Me.TabSelected = tab;
+            return;
+        }
+
         Window window = View.FindLogicalAncestorOfType<Window>() ?? throw new InvalidOperationException();
         await new SettingsWindow()
         {
@@ -67,9 +214,17 @@ public interface IView
 
     public void SearchInCodeOpen()
     {
+        if (OperatingSystem.IsAndroid())
+        {
+            TabItemViewModel tab = new(new SearchInCodeViewModel());
+            MainViewModel.Me.Tabs.Add(tab);
+            MainViewModel.Me.TabSelected = tab;
+            return;
+        }
+
         new SearchInCodeWindow()
         {
-            DataContext = new SearchInCodeViewModel(),
+            DataContext = new SearchInCodeWindowModel(),
         }.Show();
     }
 

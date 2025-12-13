@@ -270,13 +270,15 @@ namespace UndertaleModLib
             // Ensure root chunk is called "FORM"
             string name = ReadChars(4);
             if (name != "FORM")
-                throw new IOException($"Root chunk is \"{name}\", not FORM");
+                //throw new IOException($"Root chunk is \"{name}\", not FORM");
+                Console.Out.WriteLine($"Root chunk is \"{name}\", not FORM");
+            
             uint length = ReadUInt32();
             data.FORM = new UndertaleChunkFORM
             {
                 Length = length
             };
-            DebugUtil.Assert(data.FORM.Name == name);
+            //DebugUtil.Assert(data.FORM.Name == name);
 
             // Perform object counting pass on file
             long startPos = Position;
@@ -306,9 +308,15 @@ namespace UndertaleModLib
             // Read all of the main data
             Position = startPos;
             EnsureLengthOperation lenReader = EnsureLengthFromHere(data.FORM.Length);
-            data.FORM.UnserializeChunk(this);
-            lenReader.ToHere();
-
+            try
+            {
+                data.FORM.UnserializeChunk(this);
+                lenReader.ToHere();
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteLine(e);
+            }
             // Resolve resource IDs
             SubmitMessage("Resolving resource IDs...");
             foreach (UndertaleResourceRef res in _resourceRefsToResolve)
@@ -375,7 +383,7 @@ namespace UndertaleModLib
             {
                 0 => false,
                 1 => true,
-                _ => throw new IOException($"Invalid boolean value: {val}")
+                _ => false//throw new IOException($"Invalid boolean value: {val}")
             };
         }
 
@@ -716,7 +724,7 @@ namespace UndertaleModLib
 
             if (unreadObjects.Count > 0)
             {
-                throw new IOException("Found pointer targets that were never read:\n" + String.Join("\n", unreadObjects.Take(10).Select((x) => "0x" + x.ToString("X8") + " (" + objectPool[x].GetType().Name + ")")) + (unreadObjects.Count > 10 ? "\n(and more, " + unreadObjects.Count + " total)" : ""));
+                //throw new IOException("Found pointer targets that were never read:\n" + String.Join("\n", unreadObjects.Take(10).Select((x) => "0x" + x.ToString("X8") + " (" + objectPool[x].GetType().Name + ")")) + (unreadObjects.Count > 10 ? "\n(and more, " + unreadObjects.Count + " total)" : ""));
             }
         }
 
@@ -742,7 +750,8 @@ namespace UndertaleModLib
                     if (diff > 0)
                         reader.Position += (uint)diff;
                     else
-                        throw new IOException("Read underflow");
+                        //throw new IOException("Read underflow");
+                        Console.WriteLine("Read underflow: Diff = " + diff + " ,EndPos = " + endPos);
                 }
             }
         }

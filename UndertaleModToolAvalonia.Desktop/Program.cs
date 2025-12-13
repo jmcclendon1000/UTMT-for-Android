@@ -1,36 +1,22 @@
-﻿using System;
-using System.IO;
-using Avalonia;
+﻿using Avalonia;
+using System;
 
-namespace UndertaleModToolAvalonia.Desktop;
-
-class Program
+namespace UndertaleModToolAvalonia.Desktop
 {
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
-    [STAThread]
-    public static void Main(string[] args)
+    internal sealed class Program
     {
-        try
-        {
-            BuildAvaloniaApp()
-                .StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
-        }
-        catch (Exception e)
-        {
-            string localAppData = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "UndertaleModToolAvalonia");
-            Directory.CreateDirectory(localAppData);
+        // Initialization code. Don't use any Avalonia, third-party APIs or any
+        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+        // yet and stuff might break.
+        [STAThread]
+        public static void Main(string[] args) => BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
 
-            File.WriteAllText(Path.Join(localAppData, "CrashLog.txt"), e.ToString());
-            throw;
-        }
+        // Avalonia configuration, don't remove; also used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .WithInterFont()
+                .LogToTrace();
     }
-
-    // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .LogToTrace();
-
 }

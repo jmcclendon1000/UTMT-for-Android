@@ -106,4 +106,64 @@ public partial class LoaderWindow : Window, ILoaderWindow
     {
         MessageTextBlock.Text = $"{(!String.IsNullOrEmpty(message) ? message + " " : "")} - {status}";
     }
+    
+    public partial class LoaderWindowDroid : ILoaderWindow
+    {
+        private UserControl View;
+        public LoaderWindowDroid(UserControl view)
+        {
+            this.View=view;
+            View.Find<StackPanel>("TextInputBox").IsVisible = true;
+            View.Find<Button>("ButtonOk").IsVisible = false;
+            View.Find<Button>("ButtonCancel").IsVisible = false;
+            View.Find<Button>("ButtonYes").IsVisible = false;
+            View.Find<Button>("ButtonNo").IsVisible = false;
+            View.Find<TextBox>("TextTextBox").IsVisible = false;
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsVisible = true;
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsIndeterminate = true;
+            View.Find<TextBlock>("TitleText").Text = "加载中...";
+            View.Find<TextBlock>("MessageText").Text = "";
+        }
+        public void EnsureShown()
+        {
+            View.Find<StackPanel>("TextInputBox").IsVisible = true;
+        }
+
+        public void SetMessage(string message)
+        {
+            View.Find<TextBlock>("TitleText").Text = message;
+        }
+
+        public void SetStatus(string status)
+        {
+            View.Find<TextBlock>("MessageText").Text = status;
+        }
+
+        public void SetValue(int value)
+        {
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsIndeterminate = false;
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").Value = value;
+        }
+
+        public void SetMaximum(int maximum)
+        {
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").IsIndeterminate = false;
+            View.Find<ProgressBar>("TextBoxLoadingProgressBar").Maximum = maximum;
+        }
+
+        public void SetText(string text)
+        {
+            View.Find<TextBlock>("MessageText").Text = text;
+        }
+
+        public void SetTextToMessageAndStatus(string status)
+        {
+            View.Find<TextBlock>("MessageText").Text = status;
+        }
+
+        public void Close()
+        {
+            View.Find<StackPanel>("TextInputBox").IsVisible = false;
+        }
+    }
 }

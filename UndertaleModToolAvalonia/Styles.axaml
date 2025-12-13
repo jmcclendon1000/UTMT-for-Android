@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:undertaleModToolAvalonia="clr-namespace:UndertaleModToolAvalonia">
     <FluentTheme DensityStyle="Compact"/>
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
     <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
@@ -241,11 +242,11 @@
         </Style>
     </Style>
 
-    <Style Selector="Window.SettingsWindow">
+    <Style Selector="Window.SettingsWindow,undertaleModToolAvalonia|SettingsWindow">
         <Setter Property="Padding" Value="16" />
     </Style>
 
-    <Style Selector="Window.SearchInCodeWindow">
+    <Style Selector="Window.SearchInCodeWindow,undertaleModToolAvalonia|SearchInCodeView">
         <Style Selector="^ > Grid > StackPanel">
             <Setter Property="Margin" Value="8" />
         </Style>
@@ -260,7 +261,6 @@
         </Style>
 
         <Style Selector="^ > Grid > DataGrid DataGridRow">
-            <Setter Property="FontFamily" Value="Consolas,Liberation Mono,Menlo" />
         </Style>
 
         <Style Selector="^ TextBlock.StatusBar">

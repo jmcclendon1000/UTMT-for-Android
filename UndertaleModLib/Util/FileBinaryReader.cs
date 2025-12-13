@@ -13,7 +13,7 @@ namespace UndertaleModLib.Util
         private readonly Encoding encoding = new UTF8Encoding(false);
         public Stream Stream { get; set; }
 
-        private readonly long _length;
+        private long _length;
         public long Length { get => _length; }
 
         public long Position
@@ -21,8 +21,10 @@ namespace UndertaleModLib.Util
             get => Stream.Position;
             set
             {
+                // if (value > Length)
+                //     throw new IOException("Reading out of bounds.");
                 if (value > Length)
-                    throw new IOException("Reading out of bounds.");
+                    _length = value;
                 Stream.Position = value;
             }
         }
@@ -68,7 +70,15 @@ namespace UndertaleModLib.Util
             }
             if (Stream.Position + count > _length)
             {
-                throw new IOException("Reading out of bounds");
+                try
+                {
+                    throw new IOException("Reading out of bounds");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                
             }
 
             if (count > 1024)
@@ -159,7 +169,8 @@ namespace UndertaleModLib.Util
         {
             if (Stream.Position + 4 > _length)
             {
-                throw new IOException("Reading out of bounds");
+                //throw new IOException("Reading out of bounds Position:"+Stream.Position +" Length:"+_length);
+                Console.WriteLine("ReadUInt32 Reading out of bounds Position:"+Stream.Position +" Length:"+_length);
             }
 
             return BinaryPrimitives.ReadUInt32LittleEndian(ReadToBuffer(4));

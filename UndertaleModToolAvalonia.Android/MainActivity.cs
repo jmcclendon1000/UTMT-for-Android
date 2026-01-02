@@ -15,7 +15,7 @@ using UTMTdrid;
 namespace UndertaleModToolAvalonia.Android
 {
     [Activity(
-        Label = "UndertaleModToolAvalonia.Android",
+        Label = "QiuUTMTv4",
         Theme = "@style/MyTheme.NoActionBar",
         Icon = "@drawable/icon",
         MainLauncher = true,

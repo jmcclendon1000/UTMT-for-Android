@@ -6,11 +6,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UndertaleModToolAvalonia.UndertaleResourceReferenceView">
     <ContentControl DataContext="{Binding $parent[l:UndertaleResourceReferenceView]}">
-        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto" VerticalAlignment="Center">
             <!-- TODO: Can change, can remove -->
             <TextBox Grid.Column="0" Name="TextBox"
                      Text="{Binding Reference, Mode=OneWay}"
-                     IsReadOnly="True">
+                     IsReadOnly="True"
+                     Margin="0">
                 <TextBox.Resources>
                     <l:UndertaleReferenceDropHandler x:Key="UndertaleReferenceDropHandler"/>
                 </TextBox.Resources>
@@ -18,9 +19,9 @@
                     <ContextDropBehavior Handler="{StaticResource UndertaleReferenceDropHandler}"/>
                 </Interaction.Behaviors>
             </TextBox>
-            <Button Grid.Column="1" Command="{Binding Open}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}">…</Button>
-            <Button Grid.Column="2" Command="{Binding OpenInNewTab}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}">⬈</Button>
-            <Button Grid.Column="3" Command="{Binding Remove}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}">🗙</Button>
+            <Button Grid.Column="1" Command="{Binding Open}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}" Padding="5">..</Button>
+            <Button Grid.Column="2" Command="{Binding OpenInNewTab}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}"  Padding="5">..↗</Button>
+            <Button Grid.Column="3" Command="{Binding Remove}" IsEnabled="{Binding Reference, Converter={x:Static ObjectConverters.IsNotNull}}"  Padding="5">✕</Button>
         </Grid>
     </ContentControl>
 </UserControl>

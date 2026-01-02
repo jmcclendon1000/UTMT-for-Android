@@ -6,7 +6,6 @@
              xmlns:undertale="clr-namespace:UndertaleModLib;assembly=UndertaleModLib"
              xmlns:undertalem="clr-namespace:UndertaleModLib.Models;assembly=UndertaleModLib"
              xmlns:u="https://irihi.tech/ursa"
-             xmlns:resourceViews="clr-namespace:UndertaleModToolAvalonia.ResourceViews"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UndertaleModToolAvalonia.MainView"
              x:DataType="l:MainViewModel">
@@ -39,42 +38,6 @@
     </UserControl.Resources>
     <Panel>
         <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="文件">
-                    <MenuItem Header="新建" Command="{Binding FileNew}" />
-                    <MenuItem Header="打开" Command="{Binding FileOpen}" />
-                    <MenuItem Header="保存" Command="{Binding FileSave}" />
-                    <MenuItem Header="关闭" Command="{Binding FileClose}" />
-                    <!-- <Separator /> -->
-                    <!-- <MenuItem Header="临时运行游戏" IsEnabled="False" /> -->
-                    <!-- <MenuItem Header="使用调试器运行游戏" IsEnabled="False" /> -->
-                    <!-- <MenuItem Header="使用其他运行器运行游戏" IsEnabled="False" /> -->
-                    <!-- <Separator /> -->
-                    <!-- <MenuItem Header="生成偏移值图谱" IsEnabled="False" /> -->
-                    <Separator />
-                    <MenuItem Header="设置" Command="{Binding FileSettings}" />
-                    <MenuItem Header="退出" Command="{Binding FileExit}" />
-                </MenuItem>
-                <!-- <MenuItem Header="导入" IsEnabled="False"> -->
-                <!-- </MenuItem> -->
-                <!-- <MenuItem Header="导出" IsEnabled="False"> -->
-                <!-- </MenuItem> -->
-                <MenuItem Header="工具">
-                    <MenuItem Header="搜索代码" Command="{Binding ToolsSearchInCode}" />
-                    <MenuItem Header="寻找未被引用的资源" IsEnabled="False" />
-                </MenuItem>
-                <MenuItem Header="脚本">
-                    <MenuItem Header="内置脚本" ItemsSource="{Binding ScriptsSubMenuItems}" />
-                    <MenuItem Header="选择脚本文件运行" Command="{Binding ScriptsRunOtherScript}" />
-                </MenuItem>
-                <MenuItem Header="帮助">
-                    <MenuItem Header="_GitHub..." Command="{Binding HelpGitHub}" />
-                    <MenuItem Header="捐赠" Command="{Binding Donate}" />
-                    <MenuItem Header="QQ交流群..." Command="{Binding QQGroup}" />
-                    <MenuItem Header="哔哩哔哩..." Command="{Binding Bilibili}" />
-                    <MenuItem Header="关于" Command="{Binding HelpAbout}" />
-                </MenuItem>
-            </Menu>
             <!-- <NativeMenuBar DockPanel.Dock="Top" /> -->
 
             <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,auto">
@@ -87,6 +50,44 @@
                 <Grid Grid.Column="0" Name="LeftPanel" RowDefinitions="Auto,1*">
                     <StackPanel Grid.Row="0">
                         <StackPanel Orientation="Horizontal">
+                            <Menu>
+                                <MenuItem Foreground="#c090e7" Header="QiuUTMTv4" Padding="2">
+                                    <MenuItem Header="文件">
+                                        <MenuItem Header="新建" Command="{Binding FileNew}" />
+                                        <MenuItem Header="打开" Command="{Binding FileOpen}" />
+                                        <MenuItem Header="保存" Command="{Binding FileSave}" />
+                                        <MenuItem Header="关闭" Command="{Binding FileClose}" />
+                                        <!-- <Separator /> -->
+                                        <!-- <MenuItem Header="临时运行游戏" IsEnabled="False" /> -->
+                                        <!-- <MenuItem Header="使用调试器运行游戏" IsEnabled="False" /> -->
+                                        <!-- <MenuItem Header="使用其他运行器运行游戏" IsEnabled="False" /> -->
+                                        <!-- <Separator /> -->
+                                        <!-- <MenuItem Header="生成偏移值图谱" IsEnabled="False" /> -->
+                                        <Separator />
+                                        <MenuItem Header="设置" Command="{Binding FileSettings}" />
+                                        <MenuItem Header="退出" Command="{Binding FileExit}" />
+                                    </MenuItem>
+                                    <!-- <MenuItem Header="导入" IsEnabled="False"> -->
+                                    <!-- </MenuItem> -->
+                                    <!-- <MenuItem Header="导出" IsEnabled="False"> -->
+                                    <!-- </MenuItem> -->
+                                    <MenuItem Header="工具">
+                                        <MenuItem Header="搜索代码" Command="{Binding ToolsSearchInCode}" />
+                                        <MenuItem Header="寻找未被引用的资源" IsEnabled="False" />
+                                    </MenuItem>
+                                    <MenuItem Header="脚本">
+                                        <MenuItem Header="内置脚本" ItemsSource="{Binding ScriptsSubMenuItems}" />
+                                        <MenuItem Header="选择脚本文件运行" Command="{Binding ScriptsRunOtherScript}" />
+                                    </MenuItem>
+                                    <MenuItem Header="帮助">
+                                        <MenuItem Header="_GitHub..." Command="{Binding HelpGitHub}" />
+                                        <MenuItem Header="捐赠" Command="{Binding Donate}" />
+                                        <MenuItem Header="QQ交流群..." Command="{Binding QQGroup}" />
+                                        <MenuItem Header="哔哩哔哩..." Command="{Binding Bilibili}" />
+                                        <MenuItem Header="关于" Command="{Binding HelpAbout}" />
+                                    </MenuItem>
+                                </MenuItem>
+                            </Menu>
                             <Button Command="{Binding TabGoBack}"
                                     IsEnabled="{Binding TabSelected.CanGoBack, FallbackValue=False}">
                                 ←
@@ -96,8 +97,11 @@
                                 →
                             </Button>
                         </StackPanel>
-                        <TextBox Name="FilterTextBox" Watermark="按名称过滤..."
-                                 TextChanged="FilterTextBox_TextChanged" />
+                        <DockPanel LastChildFill="True">
+                            <TextBox Name="FilterTextBox" Watermark="按名称过滤..."
+                                     TextChanged="FilterTextBox_TextChanged"
+                                     Margin="0" />
+                        </DockPanel>
                     </StackPanel>
 
                     <TreeDataGrid Name="MainTreeDataGrid" Grid.Row="1" ShowColumnHeaders="False"
@@ -149,6 +153,7 @@
                                         <MenuItem Header="关闭标签页" Click="TabMenu_Close_Click" />
                                     </ContextMenu>
                                 </Setter>
+                                <Setter Property="Padding">0</Setter>
                             </Style>
                         </TabStrip.Styles>
                         <TabStrip.ItemTemplate>
@@ -267,7 +272,7 @@
                                                 <TextBlock
                                                     Text="{Binding ParticleSystemEmitter.Name.Content, StringFormat=Particle system emitter - {0}}" />
                                             </DataTemplate>
-                                            <DataTemplate DataType="resourceViews:DonateViewModel">
+                                            <DataTemplate DataType="l:DonateViewModel">
                                                 <TextBlock
                                                     Text="捐赠" />
                                             </DataTemplate>
@@ -390,7 +395,7 @@
                                             <DataTemplate DataType="l:SettingsViewModel">
                                                 <l:SettingsView />
                                             </DataTemplate>
-                                            <DataTemplate DataType="resourceViews:DonateViewModel">
+                                            <DataTemplate DataType="l:DonateViewModel">
                                                 <l:DonateView />
                                             </DataTemplate>
                                         </ContentControl.DataTemplates>
@@ -414,7 +419,8 @@
                                     BorderThickness="2"
                                     CornerRadius="3"
                                     Padding="10" Margin="10">
-                                <TextBlock Name="TitleText" TextWrapping="Wrap" FontWeight="Bold"  Foreground="#ffeeeeee" />
+                                <TextBlock Name="TitleText" TextWrapping="Wrap" FontWeight="Bold"
+                                           Foreground="#ffeeeeee" />
                             </Border>
                             <Border BorderBrush="#DD353535"
                                     BorderThickness="2"
@@ -424,7 +430,8 @@
                                     <StackPanel>
                                         <TextBlock Foreground="#ffeeeeee" Name="MessageText" TextWrapping="Wrap" />
                                         <TextBox Foreground="#ffeeeeee" Name="TextTextBox" />
-                                        <ProgressBar Foreground="#ffc199ff" Name="TextBoxLoadingProgressBar" IsIndeterminate="True" />
+                                        <ProgressBar Foreground="#ffc199ff" Name="TextBoxLoadingProgressBar"
+                                                     IsIndeterminate="True" />
                                     </StackPanel>
                                 </ScrollViewer>
                             </Border>
@@ -433,10 +440,10 @@
                                     CornerRadius="3"
                                     Padding="10" Margin="20">
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Name="ButtonOk"  Foreground="#ffeeeeee">确认</Button>
-                                    <Button Name="ButtonYes"  Foreground="#ffeeeeee">是</Button>
-                                    <Button Name="ButtonNo"  Foreground="#ffeeeeee">否</Button>
-                                    <Button Name="ButtonCancel"  Foreground="#ffeeeeee">取消</Button>
+                                    <Button Name="ButtonOk" Foreground="#ffeeeeee">确认</Button>
+                                    <Button Name="ButtonYes" Foreground="#ffeeeeee">是</Button>
+                                    <Button Name="ButtonNo" Foreground="#ffeeeeee">否</Button>
+                                    <Button Name="ButtonCancel" Foreground="#ffeeeeee">取消</Button>
                                 </StackPanel>
                             </Border>
                         </StackPanel>

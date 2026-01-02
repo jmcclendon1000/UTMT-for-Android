@@ -10,7 +10,7 @@
             <Label Content="{Binding Value}" />
             <!-- TODO: Add the textbox back in. -->
             <!-- <TextBox Text="{Binding Value}" /> -->
-            <Expander Header="Flags">
+            <Expander Header="标志(Flags)">
                 <ItemsControl ItemsSource="{Binding Flags}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

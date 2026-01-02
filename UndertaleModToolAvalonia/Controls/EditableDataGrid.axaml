@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UndertaleModToolAvalonia.EditableDataGrid">
     <ContentControl DataContext="{Binding $parent[l:EditableDataGrid]}">
-        <Grid ColumnDefinitions="1*" RowDefinitions="1*,Auto" MaxHeight="{Binding $parent[ScrollViewer].Viewport.Height}">
+        <Grid ColumnDefinitions="1*" RowDefinitions="1*,Auto" MaxHeight="{Binding $parent[ScrollViewer].Viewport.Height}" VerticalAlignment="Center">
             <DataGrid Grid.Row="0" x:Name="DataGridControl" SelectionMode="Single" ItemsSource="{Binding ItemsSource}"
                       HeadersVisibility="{Binding HeadersVisibility}" CanUserResizeColumns="True"/>
             <StackPanel Grid.Row="1" Orientation="Horizontal" IsVisible="{Binding ItemsSource, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -16,10 +16,10 @@
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                     </Style>
                 </StackPanel.Styles>
-                <Button x:Name="AddButton" Command="{Binding Add}" IsVisible="False">+</Button>
-                <Button x:Name="RemoveButton" Command="{Binding Remove}" IsVisible="False" IsEnabled="False">-</Button>
-                <RepeatButton x:Name="MoveUpButton" Command="{Binding MoveUp}" IsEnabled="False">↑</RepeatButton>
-                <RepeatButton x:Name="MoveDownButton" Command="{Binding MoveDown}" IsEnabled="False">↓</RepeatButton>
+                <Button x:Name="AddButton" Command="{Binding Add}" IsVisible="False" Padding="5">+</Button>
+                <Button x:Name="RemoveButton" Command="{Binding Remove}" IsVisible="False" IsEnabled="False" Padding="5">-</Button>
+                <RepeatButton x:Name="MoveUpButton" Command="{Binding MoveUp}" IsEnabled="False" Padding="5">↑</RepeatButton>
+                <RepeatButton x:Name="MoveDownButton" Command="{Binding MoveDown}" IsEnabled="False" Padding="5">↓</RepeatButton>
             </StackPanel>
         </Grid>
     </ContentControl>

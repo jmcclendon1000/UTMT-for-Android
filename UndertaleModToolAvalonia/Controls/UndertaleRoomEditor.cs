@@ -6,11 +6,13 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.GestureRecognizers;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
+using Avalonia.Xaml.Interactions.Custom;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
 using UndertaleModLib.Models;
@@ -30,7 +32,9 @@ public class UndertaleRoomEditor : Control
         Func<RoomItemProperties> GetProperties,
         Action<RoomItemProperties> SetProperties
     );
+
     public record RoomItemProperties(int X, int Y);
+
     public record RoomItem(
         object Object,
         UndertaleRoom.Layer? Layer = null,
@@ -64,6 +68,8 @@ public class UndertaleRoomEditor : Control
         customDrawOperation = new CustomDrawOperation(this);
         ClipToBounds = true;
         Focusable = true;
+        //GestureRecognizers.Add(new PinchGestureRecognizer());
+        GestureRecognizers.Add(new QiuGestureRecognizer(this));
     }
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -90,19 +96,21 @@ public class UndertaleRoomEditor : Control
 
             context.Custom(customDrawOperation);
 
-#if DEBUG
-            // Debug text
-            Point roomMousePosition = ((mousePosition - Translation) / Scaling);
-            context.DrawText(new FormattedText(
-                $"mouse: ({mousePosition.X}, {mousePosition.Y}), room: ({Math.Floor(roomMousePosition.X)}, {Math.Floor(roomMousePosition.Y)})\n" +
-                $"view: ({-Translation.X}, {-Translation.Y}, {-Translation.X + Bounds.Width}, {-Translation.Y + Bounds.Height}), zoom: {Scaling}x\n" +
-                $"{vm?.Room.Name.Content} ({vm?.Room.Width}, {vm?.Room.Height})\n" +
-                $"category: {vm?.CategorySelected}\n" +
-                $"custom render time: <{CustomDrawOperationTime} ms\n" +
-                $"hovered tile: {hoveredTile}",
-                CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 12, new SolidColorBrush(Colors.White)),
-                new Point(0, 0));
-#endif
+            if (vm?.IsDebugTextEnabled ?? false)
+            {
+                // Debug text
+                Point roomMousePosition = ((mousePosition - Translation) / Scaling);
+                context.DrawText(new FormattedText(
+                        $"mouse: ({mousePosition.X}, {mousePosition.Y}), room: ({Math.Floor(roomMousePosition.X)}, {Math.Floor(roomMousePosition.Y)})\n" +
+                        $"view: ({-Translation.X}, {-Translation.Y}, {-Translation.X + Bounds.Width}, {-Translation.Y + Bounds.Height}), zoom: {Scaling}x\n" +
+                        $"{vm?.Room.Name.Content} ({vm?.Room.Width}, {vm?.Room.Height})\n" +
+                        $"category: {vm?.CategorySelected}\n" +
+                        $"custom render time: <{CustomDrawOperationTime} ms\n" +
+                        $"hovered tile: {hoveredTile}",
+                        CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 12,
+                        new SolidColorBrush(Colors.White)),
+                    new Point(0, 0));
+            }
         }
 
         TopLevel topLevel = TopLevel.GetTopLevel(this)!;
@@ -174,7 +182,8 @@ public class UndertaleRoomEditor : Control
                 newPoint = new Point(newPoint.X * cos - newPoint.Y * sin, newPoint.X * sin + newPoint.Y * cos);
                 newPoint += pivot;
 
-                return newPoint.X >= rect.Left && newPoint.X <= rect.Right && newPoint.Y >= rect.Top && newPoint.Y <= rect.Bottom;
+                return newPoint.X >= rect.Left && newPoint.X <= rect.Right && newPoint.Y >= rect.Top &&
+                       newPoint.Y <= rect.Bottom;
             }
 
             foreach (RoomItem roomItem in RoomItems.Reverse<RoomItem>())
@@ -183,7 +192,8 @@ public class UndertaleRoomEditor : Control
                     continue;
 
                 if (vm!.CategorySelected is null || roomItem.Selectable.Category == vm!.CategorySelected)
-                    if (RectContainsPoint(roomItem.Selectable.Bounds, roomItem.Selectable.Rotation, roomItem.Selectable.Pivot, roomMousePosition))
+                    if (RectContainsPoint(roomItem.Selectable.Bounds, roomItem.Selectable.Rotation,
+                            roomItem.Selectable.Pivot, roomMousePosition))
                     {
                         HoveredRoomItem = roomItem;
                         break;
@@ -194,7 +204,8 @@ public class UndertaleRoomEditor : Control
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(this).Properties.IsMiddleButtonPressed)
+        if (e.GetCurrentPoint(this).Properties.IsMiddleButtonPressed || 
+            (vm?.PointerStatus == 0 && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed))
         {
             this.Focus();
             moving = true;
@@ -204,7 +215,10 @@ public class UndertaleRoomEditor : Control
         {
             Point roomMousePosition = (mousePosition - Translation) / Scaling;
 
-            if (vm!.RoomItemsSelectedItem is UndertaleRoom.Layer { LayerType: UndertaleRoom.LayerType.Tiles } tilesLayer)
+            if (vm!.RoomItemsSelectedItem is UndertaleRoom.Layer
+                {
+                    LayerType: UndertaleRoom.LayerType.Tiles
+                } tilesLayer)
             {
                 settingTiles = true;
                 SetLayerTile(roomMousePosition, tilesLayer, vm.SelectedTileData);
@@ -236,6 +250,13 @@ public class UndertaleRoomEditor : Control
         settingTiles = false;
     }
 
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        moving = false;
+        movingItem = false;
+        settingTiles = false;
+    }
+
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         if (e.Delta.Y > 0)
@@ -250,6 +271,7 @@ public class UndertaleRoomEditor : Control
             Translation /= 2;
             Scaling /= 2;
         }
+
         Translation = new Vector(Math.Round(Translation.X), Math.Round(Translation.Y));
 
         vm!.Zoom = Scaling;
@@ -285,9 +307,11 @@ public class UndertaleRoomEditor : Control
 
         RoomItems = [];
 
-        if (vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGMS2) || vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGM2024_13))
+        if (vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGMS2) ||
+            vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGM2024_13))
         {
-            IOrderedEnumerable<UndertaleRoom.Layer> layers = vm.Room.Layers.Reverse().OrderByDescending(x => x.LayerDepth);
+            IOrderedEnumerable<UndertaleRoom.Layer> layers =
+                vm.Room.Layers.Reverse().OrderByDescending(x => x.LayerDepth);
             foreach (UndertaleRoom.Layer layer in layers)
             {
                 if (!layer.IsVisible)
@@ -337,7 +361,7 @@ public class UndertaleRoomEditor : Control
             if (background.Foreground == foregrounds)
             {
                 RoomItems.Add(new(
-                   Object: background
+                    Object: background
                 ));
             }
         }
@@ -368,10 +392,7 @@ public class UndertaleRoomEditor : Control
                     Bounds: new Rect(x, y, w, h).Normalize(),
                     Rotation: 0,
                     Pivot: new Point(x, y),
-                    GetProperties: () =>
-                    {
-                        return new(roomTile.X, roomTile.Y);
-                    },
+                    GetProperties: () => { return new(roomTile.X, roomTile.Y); },
                     SetProperties: (properties) =>
                     {
                         roomTile.X = properties.X;
@@ -413,10 +434,7 @@ public class UndertaleRoomEditor : Control
                     ).Normalize(),
                     Rotation: roomSprite.OppositeRotation,
                     Pivot: new Point(layer.XOffset + roomSprite.X, layer.YOffset + roomSprite.Y),
-                    GetProperties: () =>
-                    {
-                        return new(roomSprite.X, roomSprite.Y);
-                    },
+                    GetProperties: () => { return new(roomSprite.X, roomSprite.Y); },
                     SetProperties: (properties) =>
                     {
                         roomSprite.X = properties.X;
@@ -453,10 +471,7 @@ public class UndertaleRoomEditor : Control
                     Pivot: new Point(
                         roomGameObject.X,
                         roomGameObject.Y),
-                    GetProperties: () =>
-                    {
-                        return new(roomGameObject.X, roomGameObject.Y);
-                    },
+                    GetProperties: () => { return new(roomGameObject.X, roomGameObject.Y); },
                     SetProperties: (properties) =>
                     {
                         roomGameObject.X = properties.X;
@@ -474,6 +489,7 @@ public class UndertaleRoomEditor : Control
         {
             return RoomItems.Find(x => x.Selectable is not null && x.Object == roomSelectedItem);
         }
+
         return null;
     }
 
@@ -482,7 +498,8 @@ public class UndertaleRoomEditor : Control
         RoomItem? item = GetSelectedRoomItem();
         if (item is not null && item.Selectable is not null)
         {
-            Translation = new(-item.Selectable.Bounds.X * Scaling + (Bounds.Width / 2), -item.Selectable.Bounds.Y * Scaling + (Bounds.Height / 2));
+            Translation = new(-item.Selectable.Bounds.X * Scaling + (Bounds.Width / 2),
+                -item.Selectable.Bounds.Y * Scaling + (Bounds.Height / 2));
         }
     }
 
@@ -492,27 +509,32 @@ public class UndertaleRoomEditor : Control
         if (tilesLayer.TilesData.Background is null)
             return null;
 
-        int x = (int)Math.Floor((roomMousePosition.X - tilesLayer.XOffset) / tilesLayer.TilesData.Background.GMS2TileWidth);
-        int y = (int)Math.Floor((roomMousePosition.Y - tilesLayer.YOffset) / tilesLayer.TilesData.Background.GMS2TileHeight);
+        int x = (int)Math.Floor((roomMousePosition.X - tilesLayer.XOffset) /
+                                tilesLayer.TilesData.Background.GMS2TileWidth);
+        int y = (int)Math.Floor((roomMousePosition.Y - tilesLayer.YOffset) /
+                                tilesLayer.TilesData.Background.GMS2TileHeight);
 
         if (y >= 0 && x >= 0
-            && y < tilesLayer.TilesData.TileData.Length
-            && x < tilesLayer.TilesData.TileData[y].Length)
+                   && y < tilesLayer.TilesData.TileData.Length
+                   && x < tilesLayer.TilesData.TileData[y].Length)
         {
             return tilesLayer.TilesData.TileData[y][x];
         }
+
         return null;
     }
 
     void SetLayerTile(Point roomMousePosition, UndertaleRoom.Layer tilesLayer, uint tileData)
     {
         // Find x/y position
-        int x = (int)Math.Floor((roomMousePosition.X - tilesLayer.XOffset) / tilesLayer.TilesData.Background.GMS2TileWidth);
-        int y = (int)Math.Floor((roomMousePosition.Y - tilesLayer.YOffset) / tilesLayer.TilesData.Background.GMS2TileHeight);
+        int x = (int)Math.Floor((roomMousePosition.X - tilesLayer.XOffset) /
+                                tilesLayer.TilesData.Background.GMS2TileWidth);
+        int y = (int)Math.Floor((roomMousePosition.Y - tilesLayer.YOffset) /
+                                tilesLayer.TilesData.Background.GMS2TileHeight);
 
         if (y >= 0 && x >= 0
-            && y < tilesLayer.TilesData.TileData.Length
-            && x < tilesLayer.TilesData.TileData[y].Length)
+                   && y < tilesLayer.TilesData.TileData.Length
+                   && x < tilesLayer.TilesData.TileData[y].Length)
         {
             tilesLayer.TilesData.TileData[y][x] = tileData;
         }
@@ -535,7 +557,9 @@ public class UndertaleRoomEditor : Control
             this.editor = editor;
         }
 
-        public void Dispose() { }
+        public void Dispose()
+        {
+        }
 
         public bool Equals(ICustomDrawOperation? other) => false;
 
@@ -565,7 +589,8 @@ public class UndertaleRoomEditor : Control
                 //
 
                 // Fill background of entire control
-                canvas.DrawRect(0, 0, (float)editor.Bounds.Width, (float)editor.Bounds.Height, new SKPaint { Color = SKColors.Gray });
+                canvas.DrawRect(0, 0, (float)editor.Bounds.Width, (float)editor.Bounds.Height,
+                    new SKPaint { Color = SKColors.Gray });
 
                 // Draw room outline
                 canvas.DrawRect((float)editor.Translation.X - 1,
@@ -578,7 +603,8 @@ public class UndertaleRoomEditor : Control
                 canvas.Translate((float)editor.Translation.X, (float)editor.Translation.Y);
                 canvas.Scale((float)editor.Scaling);
 
-                if (vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGMS2) || vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGM2024_13))
+                if (vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGMS2) ||
+                    vm.Room.Flags.HasFlag(UndertaleRoom.RoomEntryFlags.IsGM2024_13))
                 {
                 }
                 else
@@ -596,16 +622,24 @@ public class UndertaleRoomEditor : Control
                 if (vm.IsGridEnabled)
                 {
                     if (vm.GridWidth > 0)
-                    for (uint x = 0; x < vm.Room.Width; x += vm.GridWidth)
-                    {
-                        canvas.DrawLine(x, 0, x, vm.Room.Height, new SKPaint { Color = SKColors.White.WithAlpha(64), BlendMode = SKBlendMode.Difference });
-                    }
+                        for (uint x = 0; x < vm.Room.Width; x += vm.GridWidth)
+                        {
+                            canvas.DrawLine(x, 0, x, vm.Room.Height,
+                                new SKPaint
+                                {
+                                    Color = SKColors.White.WithAlpha(64), BlendMode = SKBlendMode.Difference
+                                });
+                        }
 
                     if (vm.GridHeight > 0)
-                    for (uint y = 0; y < vm.Room.Height; y += vm.GridHeight)
-                    {
-                        canvas.DrawLine(0, y, vm.Room.Width, y, new SKPaint { Color = SKColors.White.WithAlpha(64), BlendMode = SKBlendMode.Difference });
-                    }
+                        for (uint y = 0; y < vm.Room.Height; y += vm.GridHeight)
+                        {
+                            canvas.DrawLine(0, y, vm.Room.Width, y,
+                                new SKPaint
+                                {
+                                    Color = SKColors.White.WithAlpha(64), BlendMode = SKBlendMode.Difference
+                                });
+                        }
                 }
 
                 RoomItem? selectedRoomItem = editor.GetSelectedRoomItem();
@@ -617,7 +651,11 @@ public class UndertaleRoomEditor : Control
                     canvas.RotateDegrees((float)selectedRoomItem.Selectable.Rotation,
                         (float)(selectedRoomItem.Selectable.Pivot.X),
                         (float)(selectedRoomItem.Selectable.Pivot.Y));
-                    canvas.DrawRect(rect, new SKPaint { Color = SKColors.Blue.WithAlpha(128), StrokeWidth = 2, Style = SKPaintStyle.Stroke });
+                    canvas.DrawRect(rect,
+                        new SKPaint
+                        {
+                            Color = SKColors.Blue.WithAlpha(128), StrokeWidth = 2, Style = SKPaintStyle.Stroke
+                        });
                     canvas.Restore();
                 }
 
@@ -628,9 +666,10 @@ public class UndertaleRoomEditor : Control
 
                     canvas.Save();
                     canvas.RotateDegrees((float)hoveredRoomItem.Selectable.Rotation,
-                            (float)(hoveredRoomItem.Selectable.Pivot.X),
-                            (float)(hoveredRoomItem.Selectable.Pivot.Y));
-                    canvas.DrawRect(rect, new SKPaint { Color = SKColors.Blue.WithAlpha(128), Style = SKPaintStyle.Stroke });
+                        (float)(hoveredRoomItem.Selectable.Pivot.X),
+                        (float)(hoveredRoomItem.Selectable.Pivot.Y));
+                    canvas.DrawRect(rect,
+                        new SKPaint { Color = SKColors.Blue.WithAlpha(128), Style = SKPaintStyle.Stroke });
                     canvas.Restore();
                 }
 
@@ -713,8 +752,10 @@ public class UndertaleRoomEditor : Control
                     if (roomBackground.TiledHorizontally || roomBackground.TiledVertically)
                     {
                         // TODO: Only clip in direction of tiling
-                        canvas.ClipRect(new SKRect(0, 0, roomBackground.ParentRoom.Width, roomBackground.ParentRoom.Height));
+                        canvas.ClipRect(new SKRect(0, 0, roomBackground.ParentRoom.Width,
+                            roomBackground.ParentRoom.Height));
                     }
+
                     canvas.Translate(x, y);
                     canvas.Translate(texture.TargetX, texture.TargetY);
                     canvas.Scale(roomBackground.CalcScaleX, roomBackground.CalcScaleY);
@@ -733,7 +774,8 @@ public class UndertaleRoomEditor : Control
 
             if (backgroundData.Sprite is null)
             {
-                canvas.DrawRect(0, 0, layer.ParentRoom.Width, layer.ParentRoom.Height, new SKPaint { Color = UndertaleColor.ToColor(backgroundData.Color).ToSKColor() });
+                canvas.DrawRect(0, 0, layer.ParentRoom.Width, layer.ParentRoom.Height,
+                    new SKPaint { Color = UndertaleColor.ToColor(backgroundData.Color).ToSKColor() });
                 return;
             }
 
@@ -766,12 +808,15 @@ public class UndertaleRoomEditor : Control
                         // TODO: Only clip in direction of tiling
                         canvas.ClipRect(new SKRect(0, 0, layer.ParentRoom.Width, layer.ParentRoom.Height));
                     }
+
                     canvas.Translate(x, y);
                     canvas.Translate(texture.TargetX, texture.TargetY);
                     canvas.Scale(backgroundData.CalcScaleX, backgroundData.CalcScaleY);
                     canvas.DrawImage(image, 0, 0, new SKPaint()
                     {
-                        ColorFilter = SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(backgroundData.Color).ToSKColor(), SKBlendMode.Modulate),
+                        ColorFilter =
+                            SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(backgroundData.Color).ToSKColor(),
+                                SKBlendMode.Modulate),
                     });
                     canvas.Restore();
                 }
@@ -807,37 +852,37 @@ public class UndertaleRoomEditor : Control
                 return;
 
             for (int y = 0; y < tilesData.TileData.Length; y++)
-                for (int x = 0; x < tilesData.TileData[y].Length; x++)
+            for (int x = 0; x < tilesData.TileData[y].Length; x++)
+            {
+                uint tile = tilesData.TileData[y][x];
+                uint tileId = tile & 0x0FFFFFFF;
+                uint tileOrientation = tile >> 28;
+
+                float scaleX = (((tileOrientation >> 0) & 1) == 0) ? 1 : -1;
+                float scaleY = (((tileOrientation >> 1) & 1) == 0) ? 1 : -1;
+                float rotate = (((tileOrientation >> 2) & 1) == 0) ? 0 : 90;
+
+                float posX = (x * tilesData.Background.GMS2TileWidth) + tilesData.Background.Texture.TargetX;
+                float posY = (y * tilesData.Background.GMS2TileHeight) + tilesData.Background.Texture.TargetY;
+                float centerX = posX + ((float)tilesData.Background.GMS2TileWidth / 2);
+                float centerY = posY + ((float)tilesData.Background.GMS2TileHeight / 2);
+
+                if (tileId != 0)
                 {
-                    uint tile = tilesData.TileData[y][x];
-                    uint tileId = tile & 0x0FFFFFFF;
-                    uint tileOrientation = tile >> 28;
+                    SKImage? image = mainVM.ImageCache.GetCachedImageFromLayerTile(tilesData, tileId);
+                    if (image is null)
+                        continue;
 
-                    float scaleX = (((tileOrientation >> 0) & 1) == 0) ? 1 : -1;
-                    float scaleY = (((tileOrientation >> 1) & 1) == 0) ? 1 : -1;
-                    float rotate = (((tileOrientation >> 2) & 1) == 0) ? 0 : 90;
+                    currentUsedImages.Add(image);
 
-                    float posX = (x * tilesData.Background.GMS2TileWidth) + tilesData.Background.Texture.TargetX;
-                    float posY = (y * tilesData.Background.GMS2TileHeight) + tilesData.Background.Texture.TargetY;
-                    float centerX = posX + ((float)tilesData.Background.GMS2TileWidth / 2);
-                    float centerY = posY + ((float)tilesData.Background.GMS2TileHeight / 2);
-
-                    if (tileId != 0)
-                    {
-                        SKImage? image = mainVM.ImageCache.GetCachedImageFromLayerTile(tilesData, tileId);
-                        if (image is null)
-                            continue;
-
-                        currentUsedImages.Add(image);
-
-                        canvas.Save();
-                        canvas.Translate(layer.XOffset, layer.YOffset);
-                        canvas.RotateDegrees(rotate, centerX, centerY);
-                        canvas.Scale(scaleX, scaleY, centerX, centerY);
-                        canvas.DrawImage(image, posX, posY);
-                        canvas.Restore();
-                    }
+                    canvas.Save();
+                    canvas.Translate(layer.XOffset, layer.YOffset);
+                    canvas.RotateDegrees(rotate, centerX, centerY);
+                    canvas.Scale(scaleX, scaleY, centerX, centerY);
+                    canvas.DrawImage(image, posX, posY);
+                    canvas.Restore();
                 }
+            }
         }
 
         void RenderSprite(SKCanvas canvas, UndertaleRoom.SpriteInstance roomSprite, UndertaleRoom.Layer layer)
@@ -863,7 +908,8 @@ public class UndertaleRoomEditor : Control
 
             canvas.DrawImage(image, -roomSprite.Sprite.OriginX, -roomSprite.Sprite.OriginY, new SKPaint()
             {
-                ColorFilter = SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(roomSprite.Color).ToSKColor(), SKBlendMode.Modulate),
+                ColorFilter = SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(roomSprite.Color).ToSKColor(),
+                    SKBlendMode.Modulate),
             });
 
             canvas.Restore();
@@ -891,12 +937,65 @@ public class UndertaleRoomEditor : Control
             canvas.RotateDegrees(roomGameObject.OppositeRotation);
             canvas.Scale(roomGameObject.ScaleX, roomGameObject.ScaleY);
 
-            canvas.DrawImage(image, -gameObject.Sprite.OriginX + texture.TargetX, -gameObject.Sprite.OriginY + texture.TargetY, new SKPaint()
-            {
-                ColorFilter = SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(roomGameObject.Color).ToSKColor(), SKBlendMode.Modulate),
-            });
+            canvas.DrawImage(image, -gameObject.Sprite.OriginX + texture.TargetX,
+                -gameObject.Sprite.OriginY + texture.TargetY, new SKPaint()
+                {
+                    ColorFilter =
+                        SKColorFilter.CreateBlendMode(UndertaleColor.ToColor(roomGameObject.Color).ToSKColor(),
+                            SKBlendMode.Modulate),
+                });
 
             canvas.Restore();
+        }
+    }
+
+    public class QiuGestureRecognizer : GestureRecognizer
+    {
+        private UndertaleRoomEditor editor;
+        private bool status;
+        private Point cachedPointer;
+        public QiuGestureRecognizer(UndertaleRoomEditor editor)
+        {
+            this.editor = editor;
+        }
+
+        protected override void PointerPressed(PointerPressedEventArgs e)
+        {
+            status = true;
+            editor.OnPointerReleased(new PointerReleasedEventArgs(e.Source,e.Pointer,null,e.GetPosition(editor),e.Timestamp,e.Properties,e.KeyModifiers,MouseButton.Left));
+            editor.OnPointerPressed(e);
+            e.PreventGestureRecognition();
+        }
+
+        protected override void PointerReleased(PointerReleasedEventArgs e)
+        {
+            status = false;
+            cachedPointer = e.GetPosition(editor);
+            editor.OnPointerReleased(e);
+            //e.PreventGestureRecognition();
+        }
+
+        protected override void PointerMoved(PointerEventArgs e)
+        {
+            if (cachedPointer != null && e.Pointer.Type == PointerType.Touch)
+            {
+                var ee = e.GetPosition(editor);
+                if (ee == cachedPointer)
+                {
+                    editor.OnPointerReleased(new PointerReleasedEventArgs(e.Source,e.Pointer,null,ee,e.Timestamp,e.Properties,e.KeyModifiers,MouseButton.Left));
+                    editor.OnPointerPressed(new PointerPressedEventArgs(e.Source,e.Pointer,null,ee,e.Timestamp,e.Properties,e.KeyModifiers,1));
+                }
+                cachedPointer = ee;
+            }
+            if(status)
+                editor.OnPointerMoved(e);
+            e.PreventGestureRecognition();
+        }
+
+        protected override void PointerCaptureLost(IPointer pointer)
+        {
+            status = false;
+            editor.OnPointerReleased(null);
         }
     }
 }

@@ -18,10 +18,11 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        var t=AssetLoader.Open(new Uri($"avares://UndertaleModToolAvalonia/Assets/sth.zip"));
-        ZipExtractor.ExtractZipStream(t,AppContext.BaseDirectory);
-        base.OnFrameworkInitializationCompleted();
-        
+        if (OperatingSystem.IsAndroid())
+        {
+            var t=AssetLoader.Open(new Uri($"avares://UndertaleModToolAvalonia/Assets/sth.zip"));
+                    ZipExtractor.ExtractZipStream(t,AppContext.BaseDirectory);
+        }
         AvaloniaXamlLoader.Load(this);
         base.Initialize();
     }

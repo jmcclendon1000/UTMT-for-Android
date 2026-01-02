@@ -23,7 +23,7 @@ namespace UndertaleModLib.Util
                     return bmp;
 
                 // 与原版一致：从 QoiTexture 解码 → SKBitmap
-                var data = embeddedTexture.TextureData.Image.GetSkiaImage().Encode(SKEncodedImageFormat.Png, 100).ToArray();
+                var data = embeddedTexture.TextureData.Image.GetData();
                 using var stream = new MemoryStream(data);
                 var newBmp = SKBitmap.Decode(stream)
                                ?? throw new InvalidDataException("Failed to decode embedded texture.");

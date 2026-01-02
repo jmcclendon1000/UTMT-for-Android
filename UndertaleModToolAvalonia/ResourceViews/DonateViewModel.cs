@@ -1,6 +1,8 @@
-﻿namespace UndertaleModToolAvalonia.ResourceViews;
+﻿namespace UndertaleModToolAvalonia;
 
 public class DonateViewModel
 {
-    
+    public DonateViewModel()
+    {
+    }
 }

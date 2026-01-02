@@ -40,6 +40,11 @@ public partial class UndertaleRoomViewModel : IUndertaleResourceViewModel
     private uint _GridHeight = 20;
     [Notify]
     private double _Zoom = 1;
+    [Notify]
+    private int _PointerStatus = 0;
+    [Notify]
+    private bool _IsDebugTextEnabled = false;
+    
 
     [Notify]
     private uint _SelectedTileData = 0;

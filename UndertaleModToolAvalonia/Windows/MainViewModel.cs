@@ -27,7 +27,6 @@ using PropertyChanged.SourceGenerator;
 using UndertaleModLib;
 using UndertaleModLib.Models;
 using UndertaleModToolAvalonia.QiuIO;
-using UndertaleModToolAvalonia.ResourceViews;
 using UTMTdrid;
 using FilePickerFileType = Avalonia.Platform.Storage.FilePickerFileType;
 

@@ -77,6 +77,7 @@
                                           ParticleSystemInstanceMenu="{StaticResource ParticleSystemInstanceMenu}"
                                           TextItemInstanceMenu="{StaticResource TextItemInstanceMenu}" />
         <l:ZoomConverter x:Key="ZoomConverter" />
+        <l:SwitcherConverter x:Key="SwitcherConverter" />
     </UserControl.Resources>
     <Grid ColumnDefinitions="2*,Auto,5*" RowDefinitions="1*" MaxHeight="{Binding $parent[ScrollViewer].Viewport.Height}">
         <Grid Grid.Column="0" ColumnDefinitions="1*" RowDefinitions="1*,Auto,1*">
@@ -657,16 +658,23 @@
         </Grid>
         <GridSplitter Grid.Column="1" />
         <Grid Grid.Column="2" RowDefinitions="Auto,1*">
-            <Grid Grid.Row="0" ColumnDefinitions="1*,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="{Binding StatusText}" />
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,1*,Auto,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ToggleButton IsChecked="{Binding PointerStatus, Converter={StaticResource SwitcherConverter}, ConverterParameter=0}">➤</ToggleButton>
+                    <ToggleButton IsChecked="{Binding PointerStatus, Converter={StaticResource SwitcherConverter}, ConverterParameter=1}">❖</ToggleButton>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <ToggleButton IsChecked="{Binding IsGridEnabled}">Grid</ToggleButton>
+                    <TextBlock Text="{Binding StatusText}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ToggleButton IsChecked="{Binding IsDebugTextEnabled}">调试</ToggleButton>
+                    <ToggleButton IsChecked="{Binding IsGridEnabled}">网格</ToggleButton>
                     <TextBox Text="{Binding GridWidth}" Width="32" />
                     <TextBox Text="{Binding GridHeight}" Width="32" />
-                    <Panel Width="8" />
-                    <TextBox Text="{Binding Zoom, Converter={StaticResource ZoomConverter}}" Width="100"/>
+                </StackPanel>
+                <StackPanel Grid.Column="3" Orientation="Vertical">
+                    <TextBox Text="{Binding Zoom, Converter={StaticResource ZoomConverter}}" Width="150"/>
+                    <Slider Value="{Binding Zoom}" Maximum="3.0" Minimum="0.02"/>
                 </StackPanel>
             </Grid>
             <!-- View -->

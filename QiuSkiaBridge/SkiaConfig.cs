@@ -6,4 +6,9 @@ public class SkiaConfig
     {
         return true;
     }
+    
+    public static bool UseImageMagick()
+    {
+        return true;
+    }
 }

@@ -6,6 +6,7 @@
              xmlns:undertale="clr-namespace:UndertaleModLib;assembly=UndertaleModLib"
              xmlns:undertalem="clr-namespace:UndertaleModLib.Models;assembly=UndertaleModLib"
              xmlns:u="https://irihi.tech/ursa"
+             xmlns:assets="clr-namespace:UndertaleModToolAvalonia.Assets"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UndertaleModToolAvalonia.MainView"
              x:DataType="l:MainViewModel">
@@ -58,7 +59,7 @@
                                     Foreground="#37cb9a"
                                     IsEnabled="True" />
                                 <MenuItem Foreground="#c090e7" Header="☰" Padding="2" Margin="10,0,0,0">
-                                    <MenuItem Header="QiuUTMTv4 - 秋冥" Foreground="#c090e7" FontSize="20"
+                                    <MenuItem Header="{x:Static assets:Strings.TitleText}" Foreground="#c090e7" FontSize="20"
                                               StaysOpenOnClick="true" />
                                     <Separator />
                                     <MenuItem Header="文件">

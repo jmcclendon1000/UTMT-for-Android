@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
@@ -43,6 +44,9 @@ public partial class App : Application
         // Line below is needed to remove Avalonia data validation.
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
+        
+        // Localization
+        Assets.Strings.Culture = new CultureInfo("zh-CN");
 
         // Dependency injection.
         ServiceCollection collection = new();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -46,8 +47,8 @@ public partial class App : Application
         BindingPlugins.DataValidators.RemoveAt(0);
         
         // Localization
-        Assets.Strings.Culture = new CultureInfo("zh-CN");
-
+        Assets.Strings.Culture = Thread.CurrentThread.CurrentCulture;
+        
         // Dependency injection.
         ServiceCollection collection = new();
         collection.AddSingleton<MainViewModel>();

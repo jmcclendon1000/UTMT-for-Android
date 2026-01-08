@@ -21,7 +21,7 @@ namespace UndertaleModToolAvalonia.Assets {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Strings {
+    public class Strings {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -35,7 +35,7 @@ namespace UndertaleModToolAvalonia.Assets {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("UndertaleModToolAvalonia.Assets.Strings", typeof(Strings).Assembly);
@@ -50,7 +50,7 @@ namespace UndertaleModToolAvalonia.Assets {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -59,9 +59,183 @@ namespace UndertaleModToolAvalonia.Assets {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string AboutText {
+            get {
+                return ResourceManager.GetString("AboutText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bilibili....
+        /// </summary>
+        public static string BilibiliText {
+            get {
+                return ResourceManager.GetString("BilibiliText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a script to run.
+        /// </summary>
+        public static string ChooseScriptToRunText {
+            get {
+                return ResourceManager.GetString("ChooseScriptToRunText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string CloseFileText {
+            get {
+                return ResourceManager.GetString("CloseFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Donate.
+        /// </summary>
+        public static string DonateText {
+            get {
+                return ResourceManager.GetString("DonateText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File.
+        /// </summary>
+        public static string FileText {
+            get {
+                return ResourceManager.GetString("FileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter by name....
+        /// </summary>
+        public static string FilterByCodeText {
+            get {
+                return ResourceManager.GetString("FilterByCodeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Github....
+        /// </summary>
+        public static string GithubText {
+            get {
+                return ResourceManager.GetString("GithubText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Help.
+        /// </summary>
+        public static string HelpText {
+            get {
+                return ResourceManager.GetString("HelpText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inner Script.
+        /// </summary>
+        public static string InnerScriptText {
+            get {
+                return ResourceManager.GetString("InnerScriptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        public static string NewFileText {
+            get {
+                return ResourceManager.GetString("NewFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string OpenFileText {
+            get {
+                return ResourceManager.GetString("OpenFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QQ Group....
+        /// </summary>
+        public static string QQGroupText {
+            get {
+                return ResourceManager.GetString("QQGroupText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quit.
+        /// </summary>
+        public static string QuitText {
+            get {
+                return ResourceManager.GetString("QuitText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string SaveFileText {
+            get {
+                return ResourceManager.GetString("SaveFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Script.
+        /// </summary>
+        public static string ScriptText {
+            get {
+                return ResourceManager.GetString("ScriptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search Code.
+        /// </summary>
+        public static string SearchCodeText {
+            get {
+                return ResourceManager.GetString("SearchCodeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsText {
+            get {
+                return ResourceManager.GetString("SettingsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QiuUTMTv4 - Qiuming.
+        /// </summary>
         public static string TitleText {
             get {
-                return ResourceManager.GetString("TitleText", resourceCulture); 
+                return ResourceManager.GetString("TitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tool.
+        /// </summary>
+        public static string ToolText {
+            get {
+                return ResourceManager.GetString("ToolText", resourceCulture);
             }
         }
     }

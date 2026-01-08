@@ -62,11 +62,11 @@
                                     <MenuItem Header="{x:Static assets:Strings.TitleText}" Foreground="#c090e7" FontSize="20"
                                               StaysOpenOnClick="true" />
                                     <Separator />
-                                    <MenuItem Header="文件">
-                                        <MenuItem Header="新建" Command="{Binding FileNew}" />
-                                        <MenuItem Header="打开" Command="{Binding FileOpen}" />
-                                        <MenuItem Header="保存" Command="{Binding FileSave}" />
-                                        <MenuItem Header="关闭" Command="{Binding FileClose}" />
+                                    <MenuItem Header="{x:Static assets:Strings.FileText}">
+                                        <MenuItem Header="{x:Static assets:Strings.NewFileText}" Command="{Binding FileNew}" />
+                                        <MenuItem Header="{x:Static assets:Strings.OpenFileText}" Command="{Binding FileOpen}" />
+                                        <MenuItem Header="{x:Static assets:Strings.SaveFileText}" Command="{Binding FileSave}" />
+                                        <MenuItem Header="{x:Static assets:Strings.CloseFileText}" Command="{Binding FileClose}" />
                                         <!-- <Separator /> -->
                                         <!-- <MenuItem Header="临时运行游戏" IsEnabled="False" /> -->
                                         <!-- <MenuItem Header="使用调试器运行游戏" IsEnabled="False" /> -->
@@ -74,27 +74,27 @@
                                         <!-- <Separator /> -->
                                         <!-- <MenuItem Header="生成偏移值图谱" IsEnabled="False" /> -->
                                         <Separator />
-                                        <MenuItem Header="设置" Command="{Binding FileSettings}" />
-                                        <MenuItem Header="退出" Command="{Binding FileExit}" />
+                                        <MenuItem Header="{x:Static assets:Strings.SettingsText}" Command="{Binding FileSettings}" />
+                                        <MenuItem Header="{x:Static assets:Strings.QuitText}" Command="{Binding FileExit}" />
                                     </MenuItem>
                                     <!-- <MenuItem Header="导入" IsEnabled="False"> -->
                                     <!-- </MenuItem> -->
                                     <!-- <MenuItem Header="导出" IsEnabled="False"> -->
                                     <!-- </MenuItem> -->
-                                    <MenuItem Header="工具">
-                                        <MenuItem Header="搜索代码" Command="{Binding ToolsSearchInCode}" />
+                                    <MenuItem Header="{x:Static assets:Strings.SearchCodeText}">
+                                        <MenuItem Header="{x:Static assets:Strings.QuitText}" Command="{Binding ToolsSearchInCode}" />
                                         <MenuItem Header="寻找未被引用的资源" IsEnabled="False" />
                                     </MenuItem>
-                                    <MenuItem Header="脚本">
-                                        <MenuItem Header="内置脚本" ItemsSource="{Binding ScriptsSubMenuItems}" />
-                                        <MenuItem Header="选择脚本文件运行" Command="{Binding ScriptsRunOtherScript}" />
+                                    <MenuItem Header="{x:Static assets:Strings.ScriptText}">
+                                        <MenuItem Header="{x:Static assets:Strings.InnerScriptText}" ItemsSource="{Binding ScriptsSubMenuItems}" />
+                                        <MenuItem Header="{x:Static assets:Strings.ChooseScriptToRunText}" Command="{Binding ScriptsRunOtherScript}" />
                                     </MenuItem>
-                                    <MenuItem Header="帮助">
-                                        <MenuItem Header="_GitHub..." Command="{Binding HelpGitHub}" />
-                                        <MenuItem Header="捐赠" Command="{Binding Donate}" />
-                                        <MenuItem Header="QQ交流群..." Command="{Binding QQGroup}" />
-                                        <MenuItem Header="哔哩哔哩..." Command="{Binding Bilibili}" />
-                                        <MenuItem Header="关于" Command="{Binding HelpAbout}" />
+                                    <MenuItem Header="{x:Static assets:Strings.HelpText}">
+                                        <MenuItem Header="{x:Static assets:Strings.GithubText}" Command="{Binding HelpGitHub}" />
+                                        <MenuItem Header="{x:Static assets:Strings.DonateText}" Command="{Binding Donate}" />
+                                        <MenuItem Header="{x:Static assets:Strings.QQGroupText}" Command="{Binding QQGroup}" />
+                                        <MenuItem Header="{x:Static assets:Strings.BilibiliText}" Command="{Binding Bilibili}" />
+                                        <MenuItem Header="{x:Static assets:Strings.AboutText}" Command="{Binding HelpAbout}" />
                                     </MenuItem>
                                 </MenuItem>
                                 <MenuItem
@@ -112,7 +112,7 @@
                             </Menu>
                         </StackPanel>
                         <DockPanel LastChildFill="True">
-                            <TextBox Name="FilterTextBox" Watermark="按名称过滤..."
+                            <TextBox Name="FilterTextBox" Watermark="{x:Static assets:Strings.FilterByCodeText}"
                                      TextChanged="FilterTextBox_TextChanged"
                                      Margin="0"
                                      Padding="2" />

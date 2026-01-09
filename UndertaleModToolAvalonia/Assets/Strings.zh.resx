@@ -49,7 +49,7 @@
         <value>内置脚本</value>
   </data>
   <data name="ChooseScriptToRunText" xml:space="preserve">
-        <value>选择脚本文件运行</value>
+        <value>选择脚本文件运行…</value>
   </data>
   <data name="HelpText" xml:space="preserve">
         <value>帮助</value>

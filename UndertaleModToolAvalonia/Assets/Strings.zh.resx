@@ -58,18 +58,18 @@
         <value>捐赠</value>
   </data>
   <data name="QQGroupText" xml:space="preserve">
-        <value>QQ交流群...</value>
+        <value>QQ交流群…</value>
   </data>
   <data name="BilibiliText" xml:space="preserve">
-        <value>哔哩哔哩...</value>
+        <value>哔哩哔哩…</value>
   </data>
   <data name="AboutText" xml:space="preserve">
         <value>关于</value>
   </data>
   <data name="FilterByCodeText" xml:space="preserve">
-        <value>按名称过滤...</value>
+        <value>按名称过滤…</value>
   </data>
   <data name="GithubText" xml:space="preserve">
-    <value>Github...</value>
+    <value>Github…</value>
   </data>
 </root>

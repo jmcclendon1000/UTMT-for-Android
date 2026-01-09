@@ -1,7 +1,7 @@
 # Qiuming UndertaleModTool For Android (QiuUTMTv4)
 ![GitHub Release](https://img.shields.io/github/v/release/QiumingOrg/QiuUTMTv4?style=flat)
 ![GitHub Repo stars](https://img.shields.io/github/stars/QiumingOrg/QiuUTMTv4?style=flat)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/QiumingOrg/QiuUTMTv4/total)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/QiumingOrg/QiuUTMTv4/total)[![翻译状态](https://hosted.weblate.org/widget/qiuutmtv4/svg-badge.svg)](https://hosted.weblate.org/engage/qiuutmtv4/)
 
 [![Static Badge](https://img.shields.io/badge/Bilibili-%E7%A7%8B%E5%86%A5%E6%95%A3%E9%9B%A8__GenOuka-purple?style=flat-square)](https://space.bilibili.com/3493116076100126)[![Static Badge](https://img.shields.io/badge/Discord-qiuming__official-purple?style=flat-square)](https://discord.com/users/1124397340627845200)
 
@@ -19,7 +19,9 @@ This is an amazing UndertaleModTool Cross-platform application (specially for mo
 | Latest Stable Version(最新稳定版) | [下载(Download)](https://github.com/QiumingOrg/QiuUTMTv4/releases)                             |
 |  Latest Test Build(最新测试构建)   | [下载(Download)](https://github.com/QiumingOrg/QiuUTMTv4/actions/workflows/build_test_apk.yml) |
 
-(Both application and document are written in Chinese currently. If you wish to have your language in app or documents,welcome to PR one!)
+(We are turning from Chinese to all languages currently. If you wish to have your language in app or documents,welcome to translate on Weblate!)
+
+[Translate on Weblate](https://hosted.weblate.org/engage/qiuutmtv4/)
 
 ## 截图/Screenshot
 

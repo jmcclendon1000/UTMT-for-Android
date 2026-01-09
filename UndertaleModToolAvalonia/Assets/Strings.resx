@@ -1,86 +1,84 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-        <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:element name="root" msdata:IsDataSet="true">
 
         </xsd:element>
-    </xsd:schema>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
             PublicKeyToken=b77a5c561934e089
         </value>
-    </resheader>
-    <data name="TitleText" xml:space="preserve">
+  </resheader>
+  <data name="TitleText" xml:space="preserve">
         <value>QiuUTMTv4 - Qiuming</value>
-    </data>
-    <data name="FileText" xml:space="preserve">
+  </data>
+  <data name="FileText" xml:space="preserve">
         <value>File</value>
-    </data>
-    <data name="NewFileText" xml:space="preserve">
+  </data>
+  <data name="NewFileText" xml:space="preserve">
         <value>New</value>
-    </data>
-    <data name="OpenFileText" xml:space="preserve">
+  </data>
+  <data name="OpenFileText" xml:space="preserve">
         <value>Open</value>
-    </data>
-    <data name="SaveFileText" xml:space="preserve">
+  </data>
+  <data name="SaveFileText" xml:space="preserve">
         <value>Save</value>
-    </data>
-    <data name="CloseFileText" xml:space="preserve">
-        <value>Save</value>
-    </data>
-    <data name="SettingsText" xml:space="preserve">
+  </data>
+  <data name="CloseFileText" xml:space="preserve">
+        <value>Close</value>
+  </data>
+  <data name="SettingsText" xml:space="preserve">
         <value>Settings</value>
-    </data>
-    <data name="QuitText" xml:space="preserve">
+  </data>
+  <data name="QuitText" xml:space="preserve">
         <value>Quit</value>
-    </data>
-    <data name="ToolText" xml:space="preserve">
+  </data>
+  <data name="ToolText" xml:space="preserve">
         <value>Tool</value>
-    </data>
-    <data name="SearchCodeText" xml:space="preserve">
+  </data>
+  <data name="SearchCodeText" xml:space="preserve">
         <value>Search Code</value>
-    </data>
-    <data name="ScriptText" xml:space="preserve">
+  </data>
+  <data name="ScriptText" xml:space="preserve">
         <value>Script</value>
-    </data>
-    <data name="InnerScriptText" xml:space="preserve">
+  </data>
+  <data name="InnerScriptText" xml:space="preserve">
         <value>Inner Script</value>
-    </data>
-    <data name="ChooseScriptToRunText" xml:space="preserve">
+  </data>
+  <data name="ChooseScriptToRunText" xml:space="preserve">
         <value>Choose a script to run</value>
-    </data>
-    <data name="HelpText" xml:space="preserve">
+  </data>
+  <data name="HelpText" xml:space="preserve">
         <value>Help</value>
-    </data>
-    <data name="DonateText" xml:space="preserve">
+  </data>
+  <data name="DonateText" xml:space="preserve">
         <value>Donate</value>
-    </data>
-    <data name="QQGroupText" xml:space="preserve">
-        <value>QQ Group...</value>
-    </data>
-    <data name="BilibiliText" xml:space="preserve">
-        <value>Bilibili...</value>
-    </data>
-    <data name="AboutText" xml:space="preserve">
+  </data>
+  <data name="QQGroupText" xml:space="preserve">
+        <value>QQ Group…</value>
+  </data>
+  <data name="BilibiliText" xml:space="preserve">
+        <value>Bilibili…</value>
+  </data>
+  <data name="AboutText" xml:space="preserve">
         <value>About</value>
-    </data>
-    <data name="GithubText" xml:space="preserve">
-        <value>Github...</value>
-    </data>
-    <data name="FilterByCodeText" xml:space="preserve">
-        <value>Filter by name...</value>
-    </data>
+  </data>
+  <data name="GithubText" xml:space="preserve">
+        <value>Github…</value>
+  </data>
+  <data name="FilterByCodeText" xml:space="preserve">
+        <value>Filter by name…</value>
+  </data>
 </root>

@@ -629,9 +629,9 @@ public partial class MainViewModel
         {
             desktop.Shutdown();
         }
-        else if (OperatingSystem.IsAndroid())
+        else if (Application.Current?.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
         {
-            //TODO
+            viewApp.MainView = null;
         }
     }
 

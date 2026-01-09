@@ -282,4 +282,16 @@
   <data name="Cancel" xml:space="preserve">
     <value>取消</value>
   </data>
+  <data name="Language__Restart_to_apply" xml:space="preserve">
+    <value>🌏语言(重启生效):</value>
+  </data>
+  <data name="Auto_Detect" xml:space="preserve">
+    <value>自动检测(Auto Detect)</value>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>英文</value>
+  </data>
 </root>

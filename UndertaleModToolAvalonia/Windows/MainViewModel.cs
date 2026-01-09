@@ -133,6 +133,7 @@ public partial class MainViewModel
     public void Initialize()
     {
         Settings = SettingsFile.Load(ServiceProvider);
+        Settings.OnLanguageChanged();
         Scripting = new(ServiceProvider);
     }
 

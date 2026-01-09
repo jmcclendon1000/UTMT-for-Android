@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using PropertyChanged.SourceGenerator;
+using Semi.Avalonia;
 
 namespace UndertaleModToolAvalonia;
 
@@ -13,7 +19,10 @@ public partial class SettingsFile
 {
     public MainViewModel MainVM = null!;
 
-    public SettingsFile() { }
+    public SettingsFile()
+    {
+    }
+
     public SettingsFile(IServiceProvider serviceProvider)
     {
         MainVM = serviceProvider.GetRequiredService<MainViewModel>();
@@ -25,7 +34,8 @@ public partial class SettingsFile
 
         SettingsFile? settings = null;
 
-        string roamingAppData = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "UndertaleModToolAvalonia");
+        string roamingAppData =
+            Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QiuUTMTv4");
 
         // Load Settings.json
         string settingsPath = Path.Join(roamingAppData, "Settings.json");
@@ -49,7 +59,8 @@ public partial class SettingsFile
             }
             catch (Exception e)
             {
-                mainVM.LazyErrorMessages.Add($"Error when loading settings file:\n{e.Message}\nDefault settings loaded.");
+                mainVM.LazyErrorMessages.Add(
+                    $"Error when loading settings file:\n{e.Message}\nDefault settings loaded.");
             }
         }
 
@@ -82,7 +93,8 @@ public partial class SettingsFile
 
     public async void Save()
     {
-        string roamingAppData = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "UndertaleModToolAvalonia");
+        string roamingAppData =
+            Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QiuUTMTv4");
         Directory.CreateDirectory(roamingAppData);
 
         string json = JsonSerializer.Serialize(this, new JsonSerializerOptions()
@@ -109,8 +121,16 @@ public partial class SettingsFile
         Dark = 2,
     }
 
-    [Notify]
-    private ThemeValue _Theme;
+    public enum LanguageValue
+    {
+        AutoDetect = 0,
+        Zh = 1,
+        En = 2
+    }
+
+    [Notify] private ThemeValue _Theme;
+
+    [Notify] private LanguageValue _Language;
 
     void OnThemeChanged()
     {
@@ -126,6 +146,23 @@ public partial class SettingsFile
         }
     }
 
+    public void OnLanguageChanged()
+    {
+        if (App.Current is not null)
+        {
+            CultureInfo culture = Language switch
+            {
+                LanguageValue.AutoDetect => Thread.CurrentThread.CurrentCulture,
+                LanguageValue.Zh => new CultureInfo("zh-CN", false),
+                LanguageValue.En => new CultureInfo("en", false),
+                _ => throw new NotImplementedException(),
+            };
+            Thread.CurrentThread.CurrentUICulture = Assets.Strings.Culture = culture;
+            SemiTheme.OverrideLocaleResources(Application.Current, culture);
+            //Console.WriteLine(culture);
+        }
+    }
+
     public bool OpenNewResourceAfterCreatingIt { get; set; } = false;
     public bool EnableSyntaxHighlighting { get; set; } = true;
     public bool AutomaticallyCompileAndDecompileCodeOnLostFocus { get; set; } = true;
@@ -135,7 +172,7 @@ public partial class SettingsFile
     public uint DefaultRoomGridHeight { get; set; } = 20;
 
     public string InstanceIdPrefix { get; set; } = "inst_";
-    
+
     public bool EnableQiuUtmtV3ScriptEngine { get; set; } = true;
 
     public Underanalyzer.Decompiler.DecompileSettings DecompileSettings { get; set; } = new();

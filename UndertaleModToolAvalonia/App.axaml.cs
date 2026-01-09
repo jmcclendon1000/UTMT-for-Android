@@ -46,9 +46,6 @@ public partial class App : Application
         // Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
         
-        // Localization
-        Assets.Strings.Culture = Thread.CurrentThread.CurrentCulture;
-        
         // Dependency injection.
         ServiceCollection collection = new();
         collection.AddSingleton<MainViewModel>();

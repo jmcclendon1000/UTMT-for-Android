@@ -302,4 +302,20 @@
     <value>Cancel</value>
     <comment>Used in UndertaleModToolAvalonia\Windows\MainView.axaml document</comment>
   </data>
+  <data name="Language__Restart_to_apply" xml:space="preserve">
+    <value>🌏Language (Restart to apply)</value>
+    <comment>Used in UndertaleModToolAvalonia\ResourceViews\SettingsView.axaml document</comment>
+  </data>
+  <data name="Auto_Detect" xml:space="preserve">
+    <value>Auto Detect</value>
+    <comment>Used in UndertaleModToolAvalonia\ResourceViews\SettingsView.axaml document</comment>
+  </data>
+  <data name="Chinese" xml:space="preserve">
+    <value>Chinese</value>
+    <comment>Used in UndertaleModToolAvalonia\ResourceViews\SettingsView.axaml document</comment>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+    <comment>Used in UndertaleModToolAvalonia\ResourceViews\SettingsView.axaml document</comment>
+  </data>
 </root>

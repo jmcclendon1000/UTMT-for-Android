@@ -70,6 +70,15 @@ namespace UndertaleModToolAvalonia.Assets {
         }
         
         /// <summary>
+        ///   查找类似 Auto Detect 的本地化字符串。
+        /// </summary>
+        public static string Auto_Detect {
+            get {
+                return ResourceManager.GetString("Auto_Detect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Bilibili… 的本地化字符串。
         /// </summary>
         public static string BilibiliText {
@@ -84,6 +93,15 @@ namespace UndertaleModToolAvalonia.Assets {
         public static string Cancel {
             get {
                 return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Chinese 的本地化字符串。
+        /// </summary>
+        public static string Chinese {
+            get {
+                return ResourceManager.GetString("Chinese", resourceCulture);
             }
         }
         
@@ -174,6 +192,15 @@ namespace UndertaleModToolAvalonia.Assets {
         public static string Embedded_texture____0 {
             get {
                 return ResourceManager.GetString("Embedded_texture____0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 English 的本地化字符串。
+        /// </summary>
+        public static string English {
+            get {
+                return ResourceManager.GetString("English", resourceCulture);
             }
         }
         
@@ -273,6 +300,15 @@ namespace UndertaleModToolAvalonia.Assets {
         public static string InnerScriptText {
             get {
                 return ResourceManager.GetString("InnerScriptText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 🌏Language (Restart to apply) 的本地化字符串。
+        /// </summary>
+        public static string Language__Restart_to_apply {
+            get {
+                return ResourceManager.GetString("Language__Restart_to_apply", resourceCulture);
             }
         }
         

@@ -17,7 +17,7 @@ This is an amazing UndertaleModTool Cross-platform application (specially for mo
 |         Releases(版本)         | URL(链接) 	                                                                                    |
 |:----------------------------:|----------------------------------------------------------------------------------------------|
 | Latest Stable Version(最新稳定版) | [下载(Download)](https://github.com/QiumingOrg/QiuUTMTv4/releases)                             |
-|  Latest Test Build(最新测试构建)   | [下载(Download)](https://github.com/QiumingOrg/QiuUTMTv4/actions/workflows/build_test_apk.yml) |
+|  Latest Test Build(最新测试构建)   | [下载(Download)](https://github.com/jmcclendon1000/UTMT-for-Android/actions/workflows/build_test_apk.yml) |
 
 (We are turning from Chinese to all languages currently. If you wish to have your language in app or documents,welcome to translate on Weblate!)
 

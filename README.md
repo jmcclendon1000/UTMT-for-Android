@@ -5,7 +5,7 @@
 
 [![Static Badge](https://img.shields.io/badge/Bilibili-%E7%A7%8B%E5%86%A5%E6%95%A3%E9%9B%A8__GenOuka-purple?style=flat-square)](https://space.bilibili.com/3493116076100126)[![Static Badge](https://img.shields.io/badge/Discord-qiuming__official-purple?style=flat-square)](https://discord.com/users/1124397340627845200)
 
-This is an amazing UndertaleModTool Cross-platform application (specially for mobile).
+This is an amazing UndertaleModTool Cross-platform application (specially for mobile). This fork has Pizza Tower GameSpecificData included.
 
 这是一个专为跨平台（尤其是移动端）设计的UndertaleModTool 的独立实现。
 

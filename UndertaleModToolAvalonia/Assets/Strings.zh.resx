@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -839,5 +839,14 @@
   </data>
   <data name="UndertaleString_reference" xml:space="preserve">
     <value>(UndertaleString 的引用)</value>
+  </data>
+  <data name="Find_unused_assets" xml:space="preserve">
+    <value>寻找未被引用的资产</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>欢迎!</value>
+  </data>
+  <data name="Welcome_to_Qiumen_s_special_version" xml:space="preserve">
+    <value>欢迎使用秋冥特制版本的Undertale Mod Tool！\n\n本项目基于很多项目开发，具体请查看关于界面和源代码\n\n哔哩哔哩:@秋冥散雨_GenOuka</value>
   </data>
 </root>

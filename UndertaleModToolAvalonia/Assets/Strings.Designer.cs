@@ -682,6 +682,15 @@ namespace UndertaleModToolAvalonia.Assets {
         }
         
         /// <summary>
+        ///   查找类似 Find unused assets 的本地化字符串。
+        /// </summary>
+        public static string Find_unused_assets {
+            get {
+                return ResourceManager.GetString("Find_unused_assets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Flags 的本地化字符串。
         /// </summary>
         public static string Flags {
@@ -2208,6 +2217,24 @@ namespace UndertaleModToolAvalonia.Assets {
         public static string WAV_data__length {
             get {
                 return ResourceManager.GetString("WAV_data__length", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Welcome! 的本地化字符串。
+        /// </summary>
+        public static string Welcome {
+            get {
+                return ResourceManager.GetString("Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Welcome to Qiuming&apos;s special version of Undertale Mod Tool !\n\n This project is developed based on many projects. Please refer to the about interface and source code for details.  Bilibili:@秋冥散雨_GenOuka 的本地化字符串。
+        /// </summary>
+        public static string Welcome_to_Qiumen_s_special_version {
+            get {
+                return ResourceManager.GetString("Welcome_to_Qiumen_s_special_version", resourceCulture);
             }
         }
         

@@ -118,8 +118,8 @@ public partial class MainViewModel
         Tabs =
         [
             new TabItemViewModel(new DescriptionViewModel(
-                    "欢迎",
-                    "欢迎使用秋冥特制版本的Undertale Mod Tool！\n\n本项目基于很多项目开发，具体请查看关于界面和源代码\n\n哔哩哔哩:秋冥散雨_GenOuka"),
+                    UndertaleModToolAvalonia.Assets.Strings.Welcome,
+                    UndertaleModToolAvalonia.Assets.Strings.Welcome_to_Qiumen_s_special_version),
                 isSelected: true),
         ];
 

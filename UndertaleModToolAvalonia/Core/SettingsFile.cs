@@ -196,7 +196,7 @@ public partial class SettingsFile
         return Language switch
         {
             LanguageValue.AutoDetect => Thread.CurrentThread.CurrentCulture,
-            LanguageValue.Zh => new CultureInfo("zh-CN", false),
+            LanguageValue.Zh => new CultureInfo("zh", false),
             LanguageValue.En => new CultureInfo("en", false),
             _ => Thread.CurrentThread.CurrentCulture,
         };

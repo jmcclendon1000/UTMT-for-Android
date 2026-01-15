@@ -443,19 +443,19 @@ public partial class MainViewModel
         IsEnabled = false;
 
         ILoaderWindow w = View!.LoaderOpen();
-        w.SetText("保存数据文件中...");
+        w.SetText(UndertaleModToolAvalonia.Assets.Strings.Saving);
 
         try
         {
             await Task.Run(() => UndertaleIO.Write(stream, Data,
-                message => { Dispatcher.UIThread.Post(() => w.SetText($"保存数据文件中... {message}")); }));
+                message => { Dispatcher.UIThread.Post(() => w.SetText($"Saving... {message}")); }));
 
             return true;
         }
         catch (Exception e)
         {
             w.EnsureShown();
-            await ShowMessageDialog($"保存数据文件失败: {e.Message}");
+            await ShowMessageDialog($"Save failed: {e.Message}");
         }
         finally
         {
@@ -505,7 +505,7 @@ public partial class MainViewModel
     // Menus
     public async void FileNew()
     {
-        if (await AskFileSave("创建新的文件前要先保存吗?"))
+        if (await AskFileSave(UndertaleModToolAvalonia.Assets.Strings.Save_before_creating))
         {
             await NewData();
         }
@@ -518,7 +518,7 @@ public partial class MainViewModel
             if (!await MAUIBridge.HasRequiredStoragePermission()) return;
         }
 
-        if (!await AskFileSave("打开新的文件前要先保存吗?"))
+        if (!await AskFileSave(UndertaleModToolAvalonia.Assets.Strings.Save_before_opening))
             return;
 
         var files = await View!.OpenFileDialog(new FilePickerOpenOptions()
@@ -598,7 +598,7 @@ public partial class MainViewModel
 
         IFile? file = await View!.SaveFileDialog(new FilePickerSaveOptions()
         {
-            Title = "保存文件",
+            Title = UndertaleModToolAvalonia.Assets.Strings.Save_datafile,
             FileTypeChoices = dataFileTypes,
             DefaultExtension = ".win",
         });
@@ -613,7 +613,7 @@ public partial class MainViewModel
 
     public async void FileClose()
     {
-        if (!await AskFileSave("关闭文件前要保存吗?"))
+        if (!await AskFileSave(UndertaleModToolAvalonia.Assets.Strings.Save_before_closing))
             return;
 
         CloseData();
@@ -649,7 +649,7 @@ public partial class MainViewModel
         }
         var files = await View!.OpenFileDialog(new FilePickerOpenOptions()
         {
-            Title = "运行脚本",
+            Title = UndertaleModToolAvalonia.Assets.Strings.Run_Script,
             FileTypeFilter =
             [
                 new FilePickerFileType("C# scripts (.csx)")
@@ -693,7 +693,7 @@ public partial class MainViewModel
         if (Settings.EnableQiuUtmtV3ScriptEngine&&!OperatingSystem.IsWindows())
         {
             var loader = new LoaderWindow.LoaderWindowDroid(View.View);
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 var qf = new QiuFuncMain(file.TryGetLocalPath()??FileSystem.Current.CacheDirectory + "/temp.data",
                     Data, null,
@@ -709,14 +709,14 @@ public partial class MainViewModel
                                 loader.SetText(line);
                         });
                     }), null);
-                    CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "代码段"} 执行完成!";
+                    CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "Code"} finished!";
                 }
                 catch (Exception e)
                 {
-                    CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "代码段"} 执行异常!\n{e.Message}";
+                    CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "Code"} throw exception!\n{e.Message}";
                 }
+                loader.ShowOkButton();
             });
-            loader.ShowOkButton();
         }
         else
         {
@@ -727,7 +727,7 @@ public partial class MainViewModel
             }
 
             await Scripting.RunScript(text, filePath);
-            CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "代码段"} 执行完成!";
+            CommandTextBoxText = $"{Path.GetFileName(filePath) ?? "Code "} Finished!";
         }
     }
 
@@ -740,7 +740,7 @@ public partial class MainViewModel
     {
         await ShowMessageDialog(
             $"UndertaleModTool by the Underminers team\nUndertaleModToolAvalonia by luizzeroxis\nQiuUTMTv4 by 秋冥散雨_GenOuka\n\nLicensed under the GNU General Public License Version 3.",
-            title: "关于");
+            title: UndertaleModToolAvalonia.Assets.Strings.About);
     }
 
     public async void Donate()

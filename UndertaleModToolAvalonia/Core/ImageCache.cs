@@ -22,7 +22,28 @@ public class ImageCache
 
     public SKImage GetImageFromGMImage(GMImage gmImage)
     {
-         return gmImage.GetSkiaImage();
+        if (gmImage.Format == GMImage.ImageFormat.Png)
+        {
+            return SKImage.FromEncodedData(gmImage.GetData());
+        }
+
+        byte[] data = gmImage.ConvertToRawBgra().GetData();
+        GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+
+        SKBitmap bitmap = new();
+
+        SKImageInfo info = new(gmImage.Width, gmImage.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+        SKPixmap pixmap = new(info, gcHandle.AddrOfPinnedObject(), info.RowBytes);
+        SKImage? image = SKImage.FromPixels(pixmap, delegate
+        { gcHandle.Free(); });
+
+        if (image is null)
+        {
+            gcHandle.Free();
+            throw new Exception("Could not create image");
+        }
+
+        return image;
     }
 
     public SKImage GetCachedImageFromGMImage(GMImage gmImage)

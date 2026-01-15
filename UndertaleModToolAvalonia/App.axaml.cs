@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Reflection;
-using System.Threading;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -10,6 +6,11 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Globalization;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading;
 using UTMTdrid;
 
 namespace UndertaleModToolAvalonia;
@@ -21,6 +22,11 @@ public partial class App : Application
 
     public override void Initialize()
     {
+        SettingsFile settings = SettingsFile.LoadWithoutMainVM();
+        if (settings != null)
+        {
+            Thread.CurrentThread.CurrentUICulture = Assets.Strings.Culture = settings.getCultureInfoFromSetting();
+        }
         if (OperatingSystem.IsAndroid())
         {
             // Maybe a workaround for Magick.NET not running in .csx scripts for Android
@@ -33,7 +39,10 @@ public partial class App : Application
             }
 
             var t = AssetLoader.Open(new Uri($"avares://UndertaleModToolAvalonia/Assets/sth.zip"));
-            ZipExtractor.ExtractZipStream(t, AppContext.BaseDirectory);
+            if (t != null)
+            {
+                ZipExtractor.ExtractZipStream(t, AppContext.BaseDirectory);
+            }
         }
 
         AvaloniaXamlLoader.Load(this);

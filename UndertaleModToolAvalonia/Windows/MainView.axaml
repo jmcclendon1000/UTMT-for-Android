@@ -83,7 +83,7 @@
                                     <!-- </MenuItem> -->
                                     <MenuItem Header="{x:Static assets:Strings.SearchCodeText}">
                                         <MenuItem Header="{x:Static assets:Strings.SearchCodeText}" Command="{Binding ToolsSearchInCode}" />
-                                        <MenuItem Header="寻找未被引用的资源" IsEnabled="False" />
+                                        <MenuItem Header="{x:Static assets:Strings.Find_unused_assets}" IsEnabled="False" />
                                     </MenuItem>
                                     <MenuItem Header="{x:Static assets:Strings.ScriptText}">
                                         <MenuItem Header="{x:Static assets:Strings.InnerScriptText}" ItemsSource="{Binding ScriptsSubMenuItems}" />

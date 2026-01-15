@@ -1045,4 +1045,16 @@
     <value>(UndertaleString reference)</value>
     <comment>Used in UndertaleModToolAvalonia\Controls\UndertaleStringReferenceView.axaml.cs document</comment>
   </data>
+  <data name="Find_unused_assets" xml:space="preserve">
+    <value>Find unused assets</value>
+    <comment>Used in UndertaleModToolAvalonia\Windows\MainView.axaml document</comment>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome!</value>
+    <comment>Used in UndertaleModToolAvalonia\Windows\MainViewModel.cs document</comment>
+  </data>
+  <data name="Welcome_to_Qiumen_s_special_version" xml:space="preserve">
+    <value>Welcome to Qiuming's special version of Undertale Mod Tool !\n\n This project is developed based on many projects. Please refer to the about interface and source code for details.  Bilibili:@秋冥散雨_GenOuka</value>
+    <comment>Used in UndertaleModToolAvalonia\Windows\MainViewModel.cs document</comment>
+  </data>
 </root>

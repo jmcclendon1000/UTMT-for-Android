@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ApplicationId>com.genouka.qiuutmtv4</ApplicationId>
     <ApplicationVersion>40</ApplicationVersion>
-    <ApplicationDisplayVersion>4.0</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>4.3</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
   </PropertyGroup>

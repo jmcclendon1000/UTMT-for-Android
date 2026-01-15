@@ -1,0 +1,48 @@
+# By 秋冥散雨_Genouka
+# Licensed under MPL2.0
+
+name: Build Release APK
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: | 
+          8.0.x
+          9.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore .NET workloads
+      run: dotnet workload restore
+
+    - name: Restore the application
+      run: msbuild QiuUTMTv4.sln /t:Restore
+
+    - name: Create the app package
+      run: tool/action_build.bat
+      
+    - name: Create Release and Upload Assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          UndertaleModToolAvalonia.Android\bin\Any CPU\Debug\net9.0-android\output.merged.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

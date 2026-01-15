@@ -1,3 +1,4 @@
+// SkiaSharp Version By Qiuming
 // Texture packer by Samuel Roy
 // Uses code from https://github.com/mfascia/TexturePacker
 
@@ -8,11 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UndertaleModLib.Util;
-using ImageMagick;
+using SkiaSharp;
 
 EnsureDataLoaded();
 
-static List<MagickImage> imagesToCleanup = new();
+static List<SKBitmap> imagesToCleanup = new();
 bool importAsSprite = false;
 
 // TODO: see if this can be reimplemented using substring instead of regex?
@@ -20,7 +21,7 @@ bool importAsSprite = false;
 // "(?:_(\d+))" - an underscore followed by digits;
 // "?:" = don't make a separate group for the whole part
 Regex sprFrameRegex = new(@"^(.+?)(?:_(\d+))$", RegexOptions.Compiled);
-string importFolder = CheckValidity();
+string importFolder = "";
 
 bool noMasksForBasicRectangles = Data.IsVersionAtLeast(2022, 9); // TODO: figure out the exact version, but this is pretty close
 
@@ -51,12 +52,12 @@ try
     foreach (Atlas atlas in packer.Atlasses)
     {
         string atlasName = Path.Combine(packDir, $"{prefix}{atlasCount:000}.png");
-        using MagickImage atlasImage = TextureWorkerSkia.ReadBGRAImageFromFile(atlasName);
-        IPixelCollection<byte> atlasPixels = atlasImage.GetPixels();
+        using SKBitmap atlasImage = TextureWorkerSkia.ReadBGRAImageFromFile(atlasName);
+        SKPixmap atlasPixels = atlasImage.PeekPixels();
 
         UndertaleEmbeddedTexture texture = new();
         texture.Name = new UndertaleString($"Texture {++lastTextPage}");
-        texture.TextureData.Image = GMImage.FromMagickImage(atlasImage).ConvertToPng(); // TODO: other formats?
+        texture.TextureData.Image = GMImage.FromPng(atlasImage.Bytes,false); // TODO: other formats?
         Data.EmbeddedTextures.Add(texture);
 
         foreach (Node n in atlas.Nodes)
@@ -217,12 +218,12 @@ try
                     }
 
                     // Only generate collision masks for sprites that need them (in newer GameMaker versions)
-                    if (!noMasksForBasicRectangles || 
-                        sprite.SepMasks is not (UndertaleSprite.SepMaskType.AxisAlignedRect or UndertaleSprite.SepMaskType.RotatedRect) || 
+                    if (!noMasksForBasicRectangles ||
+                        sprite.SepMasks is not (UndertaleSprite.SepMaskType.AxisAlignedRect or UndertaleSprite.SepMaskType.RotatedRect) ||
                         sprite.CollisionMasks.Count > 0)
                     {
-                        if ((bboxMasks && grewBoundingBox) || 
-                            (sprite.SepMasks is UndertaleSprite.SepMaskType.Precise && sprite.CollisionMasks.Count == 0) || 
+                        if ((bboxMasks && grewBoundingBox) ||
+                            (sprite.SepMasks is UndertaleSprite.SepMaskType.Precise && sprite.CollisionMasks.Count == 0) ||
                             (!bboxMasks && changedSpriteDimensions))
                         {
                             // Use this node for the sprite's collision mask if the bounding box grew, if no collision mask exists for a precise sprite,
@@ -248,14 +249,14 @@ try
             {
                 for (int x = 0; x < maskWidth && x < maskNode.Bounds.Width; x++)
                 {
-                    IMagickColor<byte> pixelColor = atlasPixels.GetPixel(x + maskNode.Bounds.X, y + maskNode.Bounds.Y).ToColor();
+                    SKColor pixelColor = atlasPixels.GetPixelColor(x + maskNode.Bounds.X, y + maskNode.Bounds.Y);
                     if (bboxMasks)
                     {
-                        maskingBitArray[(y * maskStride) + x] = (pixelColor.A > 0);
+                        maskingBitArray[(y * maskStride) + x] = (pixelColor.Alpha > 0);
                     }
                     else
                     {
-                        maskingBitArray[((y + maskNode.Texture.TargetY) * maskStride) + x + maskNode.Texture.TargetX] = (pixelColor.A > 0);
+                        maskingBitArray[((y + maskNode.Texture.TargetY) * maskStride) + x + maskNode.Texture.TargetX] = (pixelColor.Alpha > 0);
                     }
                 }
             }
@@ -285,7 +286,7 @@ try
 }
 finally
 {
-    foreach (MagickImage img in imagesToCleanup)
+    foreach (SKImage img in imagesToCleanup)
     {
         img.Dispose();
     }
@@ -293,499 +294,468 @@ finally
 
 public class TextureInfo
 {
-    public string Source;
-    public int Width;
-    public int Height;
-    public int TargetX;
-    public int TargetY;
-    public int BoundingWidth;
-    public int BoundingHeight;
-    public MagickImage Image;
+public string Source;
+public int Width;
+public int Height;
+public int TargetX;
+public int TargetY;
+public int BoundingWidth;
+public int BoundingHeight;
+public SKImage Image;
 }
 
 public enum SpriteType
 {
-    Sprite,
-    Background,
-    Font,
-    Unknown
+Sprite,
+Background,
+Font,
+Unknown
 }
 
 
 public enum SplitType
 {
-    Horizontal,
-    Vertical,
+Horizontal,
+Vertical,
 }
 
 public enum BestFitHeuristic
 {
-    Area,
-    MaxOneAxis,
+Area,
+MaxOneAxis,
 }
 
 public struct Rect
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-    public int Width { get; set; }
-    public int Height { get; set; }
+public int X { get; set; }
+public int Y { get; set; }
+public int Width { get; set; }
+public int Height { get; set; }
 }
 
 public class Node
 {
-    public Rect Bounds;
-    public TextureInfo Texture;
-    public SplitType SplitType;
+public Rect Bounds;
+public TextureInfo Texture;
+public SplitType SplitType;
 }
 
 public class Atlas
 {
-    public int Width;
-    public int Height;
-    public List<Node> Nodes;
+public int Width;
+public int Height;
+public List<Node> Nodes;
 }
 
 public class Packer
 {
-    public List<TextureInfo> SourceTextures;
-    public StringWriter Log;
-    public StringWriter Error;
-    public int Padding;
-    public int AtlasSize;
-    public bool DebugMode;
-    public BestFitHeuristic FitHeuristic;
-    public List<Atlas> Atlasses;
+public List<TextureInfo> SourceTextures;
+public StringWriter Log;
+public StringWriter Error;
+public int Padding;
+public int AtlasSize;
+public bool DebugMode;
+public BestFitHeuristic FitHeuristic;
+public List<Atlas> Atlasses;
 
-    public Packer()
-    {
-        SourceTextures = new List<TextureInfo>();
-        Log = new StringWriter();
-        Error = new StringWriter();
-    }
+public Packer()
+{
+    SourceTextures = new List<TextureInfo>();
+    Log = new StringWriter();
+    Error = new StringWriter();
+}
 
-    public void Process(string _SourceDir, string _Pattern, int _AtlasSize, int _Padding, bool _DebugMode)
+public void Process(string _SourceDir, string _Pattern, int _AtlasSize, int _Padding, bool _DebugMode)
+{
+    Padding = _Padding;
+    AtlasSize = _AtlasSize;
+    DebugMode = _DebugMode;
+    //1: scan for all the textures we need to pack
+    ScanForTextures(_SourceDir, _Pattern);
+    List<TextureInfo> textures = new List<TextureInfo>();
+    textures = SourceTextures.ToList();
+    //2: generate as many atlasses as needed (with the latest one as small as possible)
+    Atlasses = new List<Atlas>();
+    while (textures.Count > 0)
     {
-        Padding = _Padding;
-        AtlasSize = _AtlasSize;
-        DebugMode = _DebugMode;
-        //1: scan for all the textures we need to pack
-        ScanForTextures(_SourceDir, _Pattern);
-        List<TextureInfo> textures = new List<TextureInfo>();
-        textures = SourceTextures.ToList();
-        //2: generate as many atlasses as needed (with the latest one as small as possible)
-        Atlasses = new List<Atlas>();
-        while (textures.Count > 0)
+        Atlas atlas = new Atlas();
+        atlas.Width = _AtlasSize;
+        atlas.Height = _AtlasSize;
+        List<TextureInfo> leftovers = LayoutAtlas(textures, atlas);
+        if (leftovers.Count == 0)
         {
-            Atlas atlas = new Atlas();
-            atlas.Width = _AtlasSize;
-            atlas.Height = _AtlasSize;
-            List<TextureInfo> leftovers = LayoutAtlas(textures, atlas);
-            if (leftovers.Count == 0)
+            // we reached the last atlas. Check if this last atlas could have been twice smaller
+            while (leftovers.Count == 0)
             {
-                // we reached the last atlas. Check if this last atlas could have been twice smaller
-                while (leftovers.Count == 0)
-                {
-                    atlas.Width /= 2;
-                    atlas.Height /= 2;
-                    leftovers = LayoutAtlas(textures, atlas);
-                }
-                // we need to go 1 step larger as we found the first size that is too small
-                // if the atlas is 0x0 then it should be 1x1 instead
-                if (atlas.Width == 0)
-                {
-                    atlas.Width = 1;
-                }
-                else
-                {
-                    atlas.Width *= 2;
-                }
-                if (atlas.Height == 0)
-                {
-                    atlas.Height = 1;
-                }
-                else
-                {
-                    atlas.Height *= 2;
-                }
+                atlas.Width /= 2;
+                atlas.Height /= 2;
                 leftovers = LayoutAtlas(textures, atlas);
             }
-            Atlasses.Add(atlas);
-            textures = leftovers;
-        }
-    }
-
-    public void SaveAtlasses(string _Destination)
-    {
-        int atlasCount = 0;
-        string prefix = _Destination.Replace(Path.GetExtension(_Destination), "");
-        string descFile = _Destination;
-
-        StreamWriter tw = new StreamWriter(_Destination);
-        tw.WriteLine("source_tex, atlas_tex, x, y, width, height");
-        foreach (Atlas atlas in Atlasses)
-        {
-            string atlasName = $"{prefix}{atlasCount:000}.png";
-
-            // 1: Save images
-            using (MagickImage img = CreateAtlasImage(atlas))
-                TextureWorkerSkia.SaveImageToFile(img, atlasName);
-
-            // 2: save description in file
-            foreach (Node n in atlas.Nodes)
+            // we need to go 1 step larger as we found the first size that is too small
+            // if the atlas is 0x0 then it should be 1x1 instead
+            if (atlas.Width == 0)
             {
-                if (n.Texture != null)
-                {
-                    tw.Write(n.Texture.Source + ", ");
-                    tw.Write(atlasName + ", ");
-                    tw.Write((n.Bounds.X).ToString() + ", ");
-                    tw.Write((n.Bounds.Y).ToString() + ", ");
-                    tw.Write((n.Bounds.Width).ToString() + ", ");
-                    tw.WriteLine((n.Bounds.Height).ToString());
-                }
-            }
-            ++atlasCount;
-        }
-        tw.Close();
-        tw = new StreamWriter(prefix + ".log");
-        tw.WriteLine("--- LOG -------------------------------------------");
-        tw.WriteLine(Log.ToString());
-        tw.WriteLine("--- ERROR -----------------------------------------");
-        tw.WriteLine(Error.ToString());
-        tw.Close();
-    }
-
-    private void ScanForTextures(string _Path, string _Wildcard)
-    {
-        DirectoryInfo di = new(_Path);
-        FileInfo[] files = di.GetFiles(_Wildcard, SearchOption.AllDirectories);
-        foreach (FileInfo fi in files)
-        {
-            (int width, int height) = TextureWorkerSkia.GetImageSizeFromFile(fi.FullName);
-            if (width == -1 || height == -1)
-                continue;
-
-            if (width <= AtlasSize && height <= AtlasSize)
-            {
-                TextureInfo ti = new();
-
-                MagickReadSettings settings = new()
-                {
-                    ColorSpace = ColorSpace.sRGB,
-                };
-                MagickImage img = new(fi.FullName);
-                imagesToCleanup.Add(img);
-
-                ti.Source = fi.FullName;
-                ti.BoundingWidth = (int)img.Width;
-                ti.BoundingHeight = (int)img.Height;
-
-                // GameMaker doesn't trim tilesets. I assume it didn't trim backgrounds too
-                ti.TargetX = 0;
-                ti.TargetY = 0;
-                if (GetSpriteType(ti.Source) != SpriteType.Background)
-                {
-                    img.BorderColor = MagickColors.Transparent;
-                    img.BackgroundColor = MagickColors.Transparent;
-                    img.Border(1);
-                    IMagickGeometry? bbox = img.BoundingBox;
-                    if (bbox is not null)
-                    {
-                        ti.TargetX = bbox.X - 1;
-                        ti.TargetY = bbox.Y - 1;
-                        // yes, .Trim() mutates the image...
-                        // it doesn't really matter though since it isn't written back or anything
-                        img.Trim();
-                    }
-                    else
-                    {
-                        // Empty sprites should be 1x1
-                        ti.TargetX = 0;
-                        ti.TargetY = 0;
-                        img.Crop(1, 1);
-                    }
-                    img.ResetPage();
-                }
-                ti.Width = (int)img.Width;
-                ti.Height = (int)img.Height;
-                ti.Image = img;
-
-                SourceTextures.Add(ti);
-
-                Log.WriteLine($"Added {fi.FullName}");
+                atlas.Width = 1;
             }
             else
             {
-                Error.WriteLine($"{fi.FullName} is too large to fix in the atlas. Skipping!");
+                atlas.Width *= 2;
+            }
+            if (atlas.Height == 0)
+            {
+                atlas.Height = 1;
+            }
+            else
+            {
+                atlas.Height *= 2;
+            }
+            leftovers = LayoutAtlas(textures, atlas);
+        }
+        Atlasses.Add(atlas);
+        textures = leftovers;
+    }
+}
+
+public void SaveAtlasses(string _Destination)
+{
+    int atlasCount = 0;
+    string prefix = _Destination.Replace(Path.GetExtension(_Destination), "");
+    string descFile = _Destination;
+
+    StreamWriter tw = new StreamWriter(_Destination);
+    tw.WriteLine("source_tex, atlas_tex, x, y, width, height");
+    foreach (Atlas atlas in Atlasses)
+    {
+        string atlasName = $"{prefix}{atlasCount:000}.png";
+
+        // 1: Save images
+        using (SKBitmap img = CreateAtlasImage(atlas))
+            TextureWorkerSkia.SaveImageToFile(img, atlasName);
+
+        // 2: save description in file
+        foreach (Node n in atlas.Nodes)
+        {
+            if (n.Texture != null)
+            {
+                tw.Write(n.Texture.Source + ", ");
+                tw.Write(atlasName + ", ");
+                tw.Write((n.Bounds.X).ToString() + ", ");
+                tw.Write((n.Bounds.Y).ToString() + ", ");
+                tw.Write((n.Bounds.Width).ToString() + ", ");
+                tw.WriteLine((n.Bounds.Height).ToString());
             }
         }
+        ++atlasCount;
     }
+    tw.Close();
+    tw = new StreamWriter(prefix + ".log");
+    tw.WriteLine("--- LOG -------------------------------------------");
+    tw.WriteLine(Log.ToString());
+    tw.WriteLine("--- ERROR -----------------------------------------");
+    tw.WriteLine(Error.ToString());
+    tw.Close();
+}
 
-    private void HorizontalSplit(Node _ToSplit, int _Width, int _Height, List<Node> _List)
+private void ScanForTextures(string _Path, string _Wildcard)
+{
+    DirectoryInfo di = new(_Path);
+    FileInfo[] files = di.GetFiles(_Wildcard, SearchOption.AllDirectories);
+    foreach (FileInfo fi in files)
     {
-        Node n1 = new Node();
-        n1.Bounds.X = _ToSplit.Bounds.X + _Width + Padding;
-        n1.Bounds.Y = _ToSplit.Bounds.Y;
-        n1.Bounds.Width = _ToSplit.Bounds.Width - _Width - Padding;
-        n1.Bounds.Height = _Height;
-        n1.SplitType = SplitType.Vertical;
-        Node n2 = new Node();
-        n2.Bounds.X = _ToSplit.Bounds.X;
-        n2.Bounds.Y = _ToSplit.Bounds.Y + _Height + Padding;
-        n2.Bounds.Width = _ToSplit.Bounds.Width;
-        n2.Bounds.Height = _ToSplit.Bounds.Height - _Height - Padding;
-        n2.SplitType = SplitType.Horizontal;
-        if (n1.Bounds.Width > 0 && n1.Bounds.Height > 0)
-            _List.Add(n1);
-        if (n2.Bounds.Width > 0 && n2.Bounds.Height > 0)
-            _List.Add(n2);
-    }
+        (int width, int height) = TextureWorkerSkia.GetImageSizeFromFile(fi.FullName);
+        if (width == -1 || height == -1)
+            continue;
 
-    private void VerticalSplit(Node _ToSplit, int _Width, int _Height, List<Node> _List)
-    {
-        Node n1 = new Node();
-        n1.Bounds.X = _ToSplit.Bounds.X + _Width + Padding;
-        n1.Bounds.Y = _ToSplit.Bounds.Y;
-        n1.Bounds.Width = _ToSplit.Bounds.Width - _Width - Padding;
-        n1.Bounds.Height = _ToSplit.Bounds.Height;
-        n1.SplitType = SplitType.Vertical;
-        Node n2 = new Node();
-        n2.Bounds.X = _ToSplit.Bounds.X;
-        n2.Bounds.Y = _ToSplit.Bounds.Y + _Height + Padding;
-        n2.Bounds.Width = _Width;
-        n2.Bounds.Height = _ToSplit.Bounds.Height - _Height - Padding;
-        n2.SplitType = SplitType.Horizontal;
-        if (n1.Bounds.Width > 0 && n1.Bounds.Height > 0)
-            _List.Add(n1);
-        if (n2.Bounds.Width > 0 && n2.Bounds.Height > 0)
-            _List.Add(n2);
-    }
-
-    private TextureInfo FindBestFitForNode(Node _Node, List<TextureInfo> _Textures)
-    {
-        TextureInfo bestFit = null;
-        float nodeArea = _Node.Bounds.Width * _Node.Bounds.Height;
-        float maxCriteria = 0.0f;
-        foreach (TextureInfo ti in _Textures)
+        if (width <= AtlasSize && height <= AtlasSize)
         {
-            switch (FitHeuristic)
-            {
-                // Max of Width and Height ratios
-                case BestFitHeuristic.MaxOneAxis:
-                    if (ti.Width <= _Node.Bounds.Width && ti.Height <= _Node.Bounds.Height)
-                    {
-                        float wRatio = (float)ti.Width / (float)_Node.Bounds.Width;
-                        float hRatio = (float)ti.Height / (float)_Node.Bounds.Height;
-                        float ratio = wRatio > hRatio ? wRatio : hRatio;
-                        if (ratio > maxCriteria)
-                        {
-                            maxCriteria = ratio;
-                            bestFit = ti;
-                        }
-                    }
-                    break;
-                // Maximize Area coverage
-                case BestFitHeuristic.Area:
-                    if (ti.Width <= _Node.Bounds.Width && ti.Height <= _Node.Bounds.Height)
-                    {
-                        float textureArea = ti.Width * ti.Height;
-                        float coverage = textureArea / nodeArea;
-                        if (coverage > maxCriteria)
-                        {
-                            maxCriteria = coverage;
-                            bestFit = ti;
-                        }
-                    }
-                    break;
-            }
+            TextureInfo ti = new();
+            SKImage img = SKImage.FromEncodedData(new FileStream(fi.FullName,FileMode.Open));
+            imagesToCleanup.Add(img);
+
+            ti.Source = fi.FullName;
+            ti.BoundingWidth = (int)img.Width;
+            ti.BoundingHeight = (int)img.Height;
+
+            // GameMaker doesn't trim tilesets. I assume it didn't trim backgrounds too
+            ti.TargetX = 0;
+            ti.TargetY = 0;
+            ti.Width = (int)img.Width;
+            ti.Height = (int)img.Height;
+            ti.Image = img;
+
+            SourceTextures.Add(ti);
+
+            Log.WriteLine($"Added {fi.FullName}");
         }
-        return bestFit;
-    }
-
-    private List<TextureInfo> LayoutAtlas(List<TextureInfo> _Textures, Atlas _Atlas)
-    {
-        List<Node> freeList = new List<Node>();
-        List<TextureInfo> textures = new List<TextureInfo>();
-        _Atlas.Nodes = new List<Node>();
-        textures = _Textures.ToList();
-        Node root = new Node();
-        root.Bounds.Width = _Atlas.Width;
-        root.Bounds.Height = _Atlas.Height;
-        root.SplitType = SplitType.Horizontal;
-        freeList.Add(root);
-        while (freeList.Count > 0 && textures.Count > 0)
+        else
         {
-            Node node = freeList[0];
-            freeList.RemoveAt(0);
-            TextureInfo bestFit = FindBestFitForNode(node, textures);
-            if (bestFit != null)
-            {
-                if (node.SplitType == SplitType.Horizontal)
+            Error.WriteLine($"{fi.FullName} is too large to fix in the atlas. Skipping!");
+        }
+    }
+}
+
+private void HorizontalSplit(Node _ToSplit, int _Width, int _Height, List<Node> _List)
+{
+    Node n1 = new Node();
+    n1.Bounds.X = _ToSplit.Bounds.X + _Width + Padding;
+    n1.Bounds.Y = _ToSplit.Bounds.Y;
+    n1.Bounds.Width = _ToSplit.Bounds.Width - _Width - Padding;
+    n1.Bounds.Height = _Height;
+    n1.SplitType = SplitType.Vertical;
+    Node n2 = new Node();
+    n2.Bounds.X = _ToSplit.Bounds.X;
+    n2.Bounds.Y = _ToSplit.Bounds.Y + _Height + Padding;
+    n2.Bounds.Width = _ToSplit.Bounds.Width;
+    n2.Bounds.Height = _ToSplit.Bounds.Height - _Height - Padding;
+    n2.SplitType = SplitType.Horizontal;
+    if (n1.Bounds.Width > 0 && n1.Bounds.Height > 0)
+        _List.Add(n1);
+    if (n2.Bounds.Width > 0 && n2.Bounds.Height > 0)
+        _List.Add(n2);
+}
+
+private void VerticalSplit(Node _ToSplit, int _Width, int _Height, List<Node> _List)
+{
+    Node n1 = new Node();
+    n1.Bounds.X = _ToSplit.Bounds.X + _Width + Padding;
+    n1.Bounds.Y = _ToSplit.Bounds.Y;
+    n1.Bounds.Width = _ToSplit.Bounds.Width - _Width - Padding;
+    n1.Bounds.Height = _ToSplit.Bounds.Height;
+    n1.SplitType = SplitType.Vertical;
+    Node n2 = new Node();
+    n2.Bounds.X = _ToSplit.Bounds.X;
+    n2.Bounds.Y = _ToSplit.Bounds.Y + _Height + Padding;
+    n2.Bounds.Width = _Width;
+    n2.Bounds.Height = _ToSplit.Bounds.Height - _Height - Padding;
+    n2.SplitType = SplitType.Horizontal;
+    if (n1.Bounds.Width > 0 && n1.Bounds.Height > 0)
+        _List.Add(n1);
+    if (n2.Bounds.Width > 0 && n2.Bounds.Height > 0)
+        _List.Add(n2);
+}
+
+private TextureInfo FindBestFitForNode(Node _Node, List<TextureInfo> _Textures)
+{
+    TextureInfo bestFit = null;
+    float nodeArea = _Node.Bounds.Width * _Node.Bounds.Height;
+    float maxCriteria = 0.0f;
+    foreach (TextureInfo ti in _Textures)
+    {
+        switch (FitHeuristic)
+        {
+            // Max of Width and Height ratios
+            case BestFitHeuristic.MaxOneAxis:
+                if (ti.Width <= _Node.Bounds.Width && ti.Height <= _Node.Bounds.Height)
                 {
-                    HorizontalSplit(node, bestFit.Width, bestFit.Height, freeList);
+                    float wRatio = (float)ti.Width / (float)_Node.Bounds.Width;
+                    float hRatio = (float)ti.Height / (float)_Node.Bounds.Height;
+                    float ratio = wRatio > hRatio ? wRatio : hRatio;
+                    if (ratio > maxCriteria)
+                    {
+                        maxCriteria = ratio;
+                        bestFit = ti;
+                    }
                 }
-                else
+                break;
+            // Maximize Area coverage
+            case BestFitHeuristic.Area:
+                if (ti.Width <= _Node.Bounds.Width && ti.Height <= _Node.Bounds.Height)
                 {
-                    VerticalSplit(node, bestFit.Width, bestFit.Height, freeList);
+                    float textureArea = ti.Width * ti.Height;
+                    float coverage = textureArea / nodeArea;
+                    if (coverage > maxCriteria)
+                    {
+                        maxCriteria = coverage;
+                        bestFit = ti;
+                    }
                 }
-                node.Texture = bestFit;
-                node.Bounds.Width = bestFit.Width;
-                node.Bounds.Height = bestFit.Height;
-                textures.Remove(bestFit);
-            }
-            _Atlas.Nodes.Add(node);
+                break;
         }
-        return textures;
     }
+    return bestFit;
+}
 
-    private MagickImage CreateAtlasImage(Atlas _Atlas)
+private List<TextureInfo> LayoutAtlas(List<TextureInfo> _Textures, Atlas _Atlas)
+{
+    List<Node> freeList = new List<Node>();
+    List<TextureInfo> textures = new List<TextureInfo>();
+    _Atlas.Nodes = new List<Node>();
+    textures = _Textures.ToList();
+    Node root = new Node();
+    root.Bounds.Width = _Atlas.Width;
+    root.Bounds.Height = _Atlas.Height;
+    root.SplitType = SplitType.Horizontal;
+    freeList.Add(root);
+    while (freeList.Count > 0 && textures.Count > 0)
     {
-        MagickImage img = new(MagickColors.Transparent, (uint)_Atlas.Width, (uint)_Atlas.Height);
-
-        foreach (Node n in _Atlas.Nodes)
+        Node node = freeList[0];
+        freeList.RemoveAt(0);
+        TextureInfo bestFit = FindBestFitForNode(node, textures);
+        if (bestFit != null)
         {
-            if (n.Texture is not null)
+            if (node.SplitType == SplitType.Horizontal)
             {
-                MagickImage sourceImg = n.Texture.Image;
-                using IMagickImage<byte> resizedSourceImg = TextureWorkerSkia.ResizeImage(sourceImg, n.Bounds.Width, n.Bounds.Height);
-                img.Composite(resizedSourceImg, n.Bounds.X, n.Bounds.Y, CompositeOperator.Copy);
+                HorizontalSplit(node, bestFit.Width, bestFit.Height, freeList);
             }
+            else
+            {
+                VerticalSplit(node, bestFit.Width, bestFit.Height, freeList);
+            }
+            node.Texture = bestFit;
+            node.Bounds.Width = bestFit.Width;
+            node.Bounds.Height = bestFit.Height;
+            textures.Remove(bestFit);
         }
-
-        return img;
+        _Atlas.Nodes.Add(node);
     }
+    return textures;
+}
+
+private SKBitmap CreateAtlasImage(Atlas _Atlas)
+{
+    SKBitmap resizedSourceImg = new SKBitmap();
+    foreach (Node n in _Atlas.Nodes)
+    {
+        if (n.Texture is not null)
+        {
+            SKImage sourceImg = n.Texture.Image;
+            resizedSourceImg = TextureWorkerSkia.ResizeImage(SKBitmap.FromImage(sourceImg), n.Bounds.Width, n.Bounds.Height);
+        }
+    }
+
+    return resizedSourceImg;
 }
 
 public static SpriteType GetSpriteType(string path)
 {
-    string folderPath = Path.GetDirectoryName(path);
-    string folderName = new DirectoryInfo(folderPath).Name;
-    string lowerName = folderName.ToLower();
+string folderPath = Path.GetDirectoryName(path);
+string folderName = new DirectoryInfo(folderPath).Name;
+string lowerName = folderName.ToLower();
 
-    if (lowerName == "backgrounds" || lowerName == "background")
-    {
-        return SpriteType.Background;
-    }
-    else if (lowerName == "fonts" || lowerName == "font")
-    {
-        return SpriteType.Font;
-    }
-    else if (lowerName == "sprites" || lowerName == "sprite")
-    {
-        return SpriteType.Sprite;
-    }
-    return SpriteType.Unknown;
+if (lowerName == "backgrounds" || lowerName == "background")
+{
+    return SpriteType.Background;
+}
+else if (lowerName == "fonts" || lowerName == "font")
+{
+    return SpriteType.Font;
+}
+else if (lowerName == "sprites" || lowerName == "sprite")
+{
+    return SpriteType.Sprite;
+}
+return SpriteType.Unknown;
 }
 
 string CheckValidity()
 {
-    bool recursiveCheck = ScriptQuestion(@"This script imports all sprites in all subdirectories recursively.
+bool recursiveCheck = ScriptQuestion(@"This script imports all sprites in all subdirectories recursively.
 If an image file is in a folder named ""Backgrounds"", then the image will be imported as a background.
 Otherwise, the image will be imported as a sprite.
 Do you want to continue?");
-    if (!recursiveCheck)
-        throw new ScriptException("Script cancelled.");
+if (!recursiveCheck)
+    throw new ScriptException("Script cancelled.");
 
-    // Get import folder
-    string importFolder = PromptChooseDirectory();
-    if (importFolder == null)
-        throw new ScriptException("The import folder was not set.");
+// Get import folder
+string importFolder = PromptChooseDirectory();
+if (importFolder == null)
+    throw new ScriptException("The import folder was not set.");
 
-    //Stop the script if there's missing sprite entries or w/e.
-    bool hadMessage = false;
-    string currSpriteName = null;
-    string[] dirFiles = Directory.GetFiles(importFolder, "*.png", SearchOption.AllDirectories);
-    foreach (string file in dirFiles)
+//Stop the script if there's missing sprite entries or w/e.
+bool hadMessage = false;
+string currSpriteName = null;
+string[] dirFiles = Directory.GetFiles(importFolder, "*.png", SearchOption.AllDirectories);
+foreach (string file in dirFiles)
+{
+    string FileNameWithExtension = Path.GetFileName(file);
+    string stripped = Path.GetFileNameWithoutExtension(file);
+    string spriteName = "";
+
+    SpriteType spriteType = GetSpriteType(file);
+
+    if ((spriteType != SpriteType.Sprite) && (spriteType != SpriteType.Background))
     {
-        string FileNameWithExtension = Path.GetFileName(file);
-        string stripped = Path.GetFileNameWithoutExtension(file);
-        string spriteName = "";
-
-        SpriteType spriteType = GetSpriteType(file);
-
-        if ((spriteType != SpriteType.Sprite) && (spriteType != SpriteType.Background))
+        if (!hadMessage)
         {
-            if (!hadMessage)
-            {
-                hadMessage = true;
-                importAsSprite = ScriptQuestion(FileNameWithExtension + @" is in an incorrectly-named folder (valid names being ""Sprites"" and ""Backgrounds""). Would you like to import these images as sprites?
+            hadMessage = true;
+            importAsSprite = ScriptQuestion(FileNameWithExtension + @" is in an incorrectly-named folder (valid names being ""Sprites"" and ""Backgrounds""). Would you like to import these images as sprites?
 Pressing ""No"" will cause the program to ignore these images.");
-            }
-
-            if (!importAsSprite)
-            {
-                continue;
-            }
-            else
-            {
-                spriteType = SpriteType.Sprite;
-            }
         }
 
-        // Check for duplicate filenames
-        string[] dupFiles = Directory.GetFiles(importFolder, FileNameWithExtension, SearchOption.AllDirectories);
-        if (dupFiles.Length > 1)
-            throw new ScriptException("Duplicate file detected. There are " + dupFiles.Length + " files named: " + FileNameWithExtension);
-
-        // Sprites can have multiple frames! Do some sprite-specific checking.
-        if (spriteType == SpriteType.Sprite)
+        if (!importAsSprite)
         {
-            var spriteParts = sprFrameRegex.Match(stripped);
-            // Allow sprites without underscores
-            if (!spriteParts.Groups[2].Success)
-                continue;
-
-            spriteName = spriteParts.Groups[1].Value;
-
-            if (!Int32.TryParse(spriteParts.Groups[2].Value, out int frame))
-                throw new ScriptException($"{spriteName} has an invalid frame index.");
-            if (frame < 0)
-                throw new ScriptException($"{spriteName} is using an invalid numbering scheme. The script has stopped for your own protection.");
-
-            // If it's not a first frame of the sprite
-            if (spriteName == currSpriteName)
-                continue;
-            
-            string[][] spriteFrames = Directory.GetFiles(importFolder, $"{spriteName}_*.png", SearchOption.AllDirectories)
-                                               .Select(x =>
-                                               {
-                                                  var match = sprFrameRegex.Match(Path.GetFileNameWithoutExtension(x));
-                                                  if (match.Groups[2].Success)
-                                                      return new string[] { match.Groups[1].Value, match.Groups[2].Value };
-                                                  else
-                                                      return null;
-                                               })
-                                               .OfType<string[]>().ToArray();
-            if (spriteFrames.Length == 1)
-            {
-                currSpriteName = null;
-                continue;
-            }    
-            
-            int[] frameIndexes = spriteFrames.Select(x =>
-            {
-                if (Int32.TryParse(x[1], out int frame))
-                    return (int?)frame;
-                else
-                    return null;
-            }).OfType<int?>().Cast<int>().OrderBy(x => x).ToArray();
-            if (frameIndexes.Length == 1)
-            {
-                currSpriteName = null;
-                continue;
-            }
-            
-            for (int i = 0; i < frameIndexes.Length - 1; i++)
-            {
-                int num = frameIndexes[i];
-                int nextNum = frameIndexes[i + 1];
-
-                if (nextNum - num > 1)
-                    throw new ScriptException(spriteName + " is missing one or more indexes.\nThe detected missing index is: " + (num + 1));
-            }
-
-            currSpriteName = spriteName;
+            continue;
+        }
+        else
+        {
+            spriteType = SpriteType.Sprite;
         }
     }
-    return importFolder;
+
+    // Check for duplicate filenames
+    string[] dupFiles = Directory.GetFiles(importFolder, FileNameWithExtension, SearchOption.AllDirectories);
+    if (dupFiles.Length > 1)
+        throw new ScriptException("Duplicate file detected. There are " + dupFiles.Length + " files named: " + FileNameWithExtension);
+
+    // Sprites can have multiple frames! Do some sprite-specific checking.
+    if (spriteType == SpriteType.Sprite)
+    {
+        var spriteParts = sprFrameRegex.Match(stripped);
+        // Allow sprites without underscores
+        if (!spriteParts.Groups[2].Success)
+            continue;
+
+        spriteName = spriteParts.Groups[1].Value;
+
+        if (!Int32.TryParse(spriteParts.Groups[2].Value, out int frame))
+            throw new ScriptException($"{spriteName} has an invalid frame index.");
+        if (frame < 0)
+            throw new ScriptException($"{spriteName} is using an invalid numbering scheme. The script has stopped for your own protection.");
+
+        // If it's not a first frame of the sprite
+        if (spriteName == currSpriteName)
+            continue;
+
+        string[][] spriteFrames = Directory.GetFiles(importFolder, $"{spriteName}_*.png", SearchOption.AllDirectories)
+                                            .Select(x =>
+                                            {
+                                                var match = sprFrameRegex.Match(Path.GetFileNameWithoutExtension(x));
+                                                if (match.Groups[2].Success)
+                                                    return new string[] { match.Groups[1].Value, match.Groups[2].Value };
+                                                else
+                                                    return null;
+                                            })
+                                            .OfType<string[]>().ToArray();
+        if (spriteFrames.Length == 1)
+        {
+            currSpriteName = null;
+            continue;
+        }
+
+        int[] frameIndexes = spriteFrames.Select(x =>
+        {
+            if (Int32.TryParse(x[1], out int frame))
+                return (int?)frame;
+            else
+                return null;
+        }).OfType<int?>().Cast<int>().OrderBy(x => x).ToArray();
+        if (frameIndexes.Length == 1)
+        {
+            currSpriteName = null;
+            continue;
+        }
+
+        for (int i = 0; i < frameIndexes.Length - 1; i++)
+        {
+            int num = frameIndexes[i];
+            int nextNum = frameIndexes[i + 1];
+
+            if (nextNum - num > 1)
+                throw new ScriptException(spriteName + " is missing one or more indexes.\nThe detected missing index is: " + (num + 1));
+        }
+
+        currSpriteName = spriteName;
+    }
+}
+return importFolder;
 }

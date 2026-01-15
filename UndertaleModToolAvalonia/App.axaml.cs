@@ -39,7 +39,10 @@ public partial class App : Application
             }
 
             var t = AssetLoader.Open(new Uri($"avares://UndertaleModToolAvalonia/Assets/sth.zip"));
-            ZipExtractor.ExtractZipStream(t, AppContext.BaseDirectory);
+            if (t != null)
+            {
+                ZipExtractor.ExtractZipStream(t, AppContext.BaseDirectory);
+            }
         }
 
         AvaloniaXamlLoader.Load(this);

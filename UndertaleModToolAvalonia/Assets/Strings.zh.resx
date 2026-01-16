@@ -133,7 +133,7 @@
     <value>保存</value>
   </data>
   <data name="CloseFileText" xml:space="preserve">
-    <value>保存</value>
+    <value>关闭</value>
   </data>
   <data name="SettingsText" xml:space="preserve">
     <value>设置</value>
@@ -881,5 +881,11 @@
   </data>
   <data name="About" xml:space="preserve">
     <value>关于</value>
+  </data>
+  <data name="Code_Editor" xml:space="preserve">
+    <value>代码编辑器</value>
+  </data>
+  <data name="Use_SoraEditor_as_code_editor__Only" xml:space="preserve">
+    <value>使用SoraEditor作为代码编辑器(仅适用于Android)</value>
   </data>
 </root>

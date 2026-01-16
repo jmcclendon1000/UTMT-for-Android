@@ -66,9 +66,10 @@
             string UnknownArgumentNamePattern { get; set; } = "arg{0}";
             -->
 
-            <TextBlock FontWeight="Bold">代码编辑器</TextBlock>
+            <TextBlock FontWeight="Bold" Text="{x:Static assets:Strings.Code_Editor}"></TextBlock>
             <Separator />
-
+            <CheckBox Content="{x:Static strings:Strings.Use_SoraEditor_as_code_editor__Only}"
+                      IsChecked="{Binding MainVM.Settings.UseSoraEditor}" />
             <Grid ColumnDefinitions="1*,1*">
                 <StackPanel Grid.Column="0">
                     <CheckBox Content="{x:Static assets:Strings.Use_CSS_hex_color_literals}"

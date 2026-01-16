@@ -10,6 +10,8 @@ using Avalonia.Android;
 using Avalonia.Maui;
 using Avalonia.Media;
 using Microsoft.Maui.ApplicationModel;
+using UndertaleModToolAvalonia.Android.NativeViews;
+using UndertaleModToolAvalonia.NativeViews;
 using UTMTdrid;
 
 namespace UndertaleModToolAvalonia.Android
@@ -23,18 +25,19 @@ namespace UndertaleModToolAvalonia.Android
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity<App>
     {
+        
         public const string Font = "avares://UndertaleModToolAvalonia/Assets/unifont.ttf#Unifont";
+
+        public MainActivity()
+        {
+            //ISoraEditorAndroid.Implementation = new SoraEditorAndroid(this);
+        }
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
         {
-            //RequestPermissions(["android.permission.WRITE_EXTERNAL_STORAGE"],0);
-            //RequestFullscreenMode(FullscreenModeRequest.Enter, null);
-            //CheckExternalStoragePermission();
             Com.Kongzue.Dialogx.DialogX.Init(Application);
             MAUIBridge.AskDialog = Bindme.dAskDialog;
             MAUIBridge.InputDialog = Bindme.dInputDialog;
             MAUIBridge.HasRequiredStoragePermission = HasStoragePermission;
-            //MAUIBridge.AskDialog = async (title, message) => { return false; };
-            //MAUIBridge.InputDialog = async (title, message) => { return null; };
             return base.CustomizeAppBuilder(builder)
                 .UseMaui<MauiApplication>(this)
                 .With(new FontManagerOptions

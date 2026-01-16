@@ -358,6 +358,15 @@ namespace UndertaleModToolAvalonia.Assets {
         }
         
         /// <summary>
+        ///   查找类似 Code Editor 的本地化字符串。
+        /// </summary>
+        public static string Code_Editor {
+            get {
+                return ResourceManager.GetString("Code_Editor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Code locals 的本地化字符串。
         /// </summary>
         public static string Code_locals {
@@ -2253,6 +2262,15 @@ namespace UndertaleModToolAvalonia.Assets {
         public static string Use_QiuUTMTv3_Script_Engine_to_execute {
             get {
                 return ResourceManager.GetString("Use_QiuUTMTv3_Script_Engine_to_execute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Use SoraEditor as code editor (Only design for Android) 的本地化字符串。
+        /// </summary>
+        public static string Use_SoraEditor_as_code_editor__Only {
+            get {
+                return ResourceManager.GetString("Use_SoraEditor_as_code_editor__Only", resourceCulture);
             }
         }
         

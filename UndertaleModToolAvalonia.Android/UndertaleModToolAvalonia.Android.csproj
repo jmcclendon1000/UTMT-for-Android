@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SoraEditor\SoraEditor.csproj" />
     <ProjectReference Include="..\UndertaleModToolAvalonia\UndertaleModToolAvalonia.csproj" />
   </ItemGroup>
 </Project>

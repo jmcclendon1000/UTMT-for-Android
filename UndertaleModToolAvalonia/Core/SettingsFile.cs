@@ -213,6 +213,8 @@ public partial class SettingsFile
     public string InstanceIdPrefix { get; set; } = "inst_";
 
     public bool EnableQiuUtmtV3ScriptEngine { get; set; } = true;
+    
+    public bool UseSoraEditor { get; set; } = true;
 
     public Underanalyzer.Decompiler.DecompileSettings DecompileSettings { get; set; } = new();
 }

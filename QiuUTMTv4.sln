@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Underanalyzer", "UndertaleM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UndertaleModLib", "UndertaleModTool\UndertaleModLib\UndertaleModLib.csproj", "{07B5151E-37D0-4C14-B831-6313758F0AC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoraEditor", "SoraEditor\SoraEditor.csproj", "{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,14 @@ Global
 		{07B5151E-37D0-4C14-B831-6313758F0AC9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{07B5151E-37D0-4C14-B831-6313758F0AC9}.Release|x64.ActiveCfg = Release|x64
 		{07B5151E-37D0-4C14-B831-6313758F0AC9}.Release|x64.Build.0 = Release|x64
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Debug|x64.Build.0 = Debug|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Release|x64.ActiveCfg = Release|Any CPU
+		{242AEDF3-93D3-42FD-A270-D00AF73CBFA2}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

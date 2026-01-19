@@ -1,11 +1,15 @@
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Xml;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
 using AvaloniaEdit.Highlighting.Xshd;
 
@@ -21,12 +25,23 @@ public partial class UndertaleCodeView : UserControl, IUndertaleCodeView
     public UndertaleCodeView()
     {
         InitializeComponent();
-
+        
         DataContextChanged += (_, __) =>
         {
             if (DataContext is UndertaleCodeViewModel vm)
             {
                 vm.View = this;
+                if (vm.MainVM.Settings!.UseSoraEditor&&OperatingSystem.IsAndroid())
+                {
+                    ClassicGmlTab.IsVisible = false;
+                    ClassicAsmTab.IsVisible = false;
+                    SoraEditorGmlTab.IsSelected = true;
+                }
+                else
+                {
+                    SoraEditorGmlTab.IsVisible = false;
+                    SoraEditorAsmTab.IsVisible = false;
+                }
                 if (vm.MainVM.Settings!.EnableSyntaxHighlighting)
                 {
                     UndertaleCodeView.GMLHighlightingDefinition ??= LoadHighlightingDefinition("GML");

@@ -9,7 +9,7 @@
         <ProductName>QiuSkiaBridge</ProductName>
         <Copyright>Copyright © GenOuka 2018-2025,licensed under MPL2.0</Copyright>
         <DebugType>embedded</DebugType>
-        <Platforms>AnyCPU;x64</Platforms>
+        <Platforms>AnyCPU;x64;arm64-v8a</Platforms>
         <NeutralLanguage>en</NeutralLanguage>
         <ResourceLanguages>en</ResourceLanguages>
         <SatelliteResourceLanguages>en</SatelliteResourceLanguages>

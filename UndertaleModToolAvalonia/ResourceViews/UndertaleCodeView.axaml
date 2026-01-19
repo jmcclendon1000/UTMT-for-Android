@@ -8,7 +8,8 @@
              xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="UndertaleModToolAvalonia.UndertaleCodeView"
-             x:DataType="l:UndertaleCodeViewModel" xmlns:strings1="clr-namespace:UndertaleModToolAvalonia.Assets" >
+             x:DataType="l:UndertaleCodeViewModel" xmlns:strings1="clr-namespace:UndertaleModToolAvalonia.Assets"
+             xmlns:nativeViews="clr-namespace:UndertaleModToolAvalonia.NativeViews">
     <Grid RowDefinitions="Auto,1*" ColumnDefinitions="1*" MaxHeight="{Binding $parent[ContentControl].Bounds.Height}">
         <Grid Grid.Row="0" ColumnDefinitions="1*,Auto" Classes="PaddedProperties">
             <Grid Grid.Column="0" l:AutoGridBehavior.Enable="True" ColumnDefinitions="1*,3*">
@@ -23,7 +24,7 @@
         
         <TabControl Grid.Row="1" IsVisible="{Binding Code.ParentEntry, Converter={x:Static ObjectConverters.IsNull}}"
                     SelectedIndex="{Binding SelectedTab}">
-            <TabItem Header="GML">
+            <TabItem Header="GML" Name="ClassicGmlTab">
                 <ThemeVariantScope RequestedThemeVariant="Dark">
                     <AvaloniaEdit:TextEditor x:Name="GMLTextEditor"
                                              Document="{Binding GMLTextDocument}"
@@ -38,7 +39,7 @@
                     </AvaloniaEdit:TextEditor>
                 </ThemeVariantScope>
             </TabItem>
-            <TabItem Header="ASM">
+            <TabItem Header="ASM" Name="ClassicAsmTab">
                 <ThemeVariantScope RequestedThemeVariant="Dark">
                     <AvaloniaEdit:TextEditor x:Name="ASMTextEditor"
                                              Document="{Binding ASMTextDocument}"
@@ -51,6 +52,23 @@
                             <KeyBinding Gesture="Ctrl+K" Command="{Binding CompileAndDecompileASM}" />
                         </AvaloniaEdit:TextEditor.KeyBindings>
                     </AvaloniaEdit:TextEditor>
+                </ThemeVariantScope>
+            </TabItem>
+            <!-- SoraEditor -->
+            <TabItem Header="GML" Name="SoraEditorGmlTab">
+                <ThemeVariantScope RequestedThemeVariant="Dark">
+                    <nativeViews:SoraEditorControl x:Name="GMLTextEditorSora"
+                                                   Document="{Binding ASMTextDocument}"
+                                                   LostFocus="GMLTextEditor_LostFocus">
+                    </nativeViews:SoraEditorControl>
+                </ThemeVariantScope>
+            </TabItem>
+            <TabItem Header="ASM" Name="SoraEditorAsmTab">
+                <ThemeVariantScope RequestedThemeVariant="Dark">
+                    <nativeViews:SoraEditorControl x:Name="ASMTextEditorSora"
+                                                   Document="{Binding ASMTextDocument}"
+                                                   LostFocus="GMLTextEditor_LostFocus">
+                    </nativeViews:SoraEditorControl>
                 </ThemeVariantScope>
             </TabItem>
         </TabControl>

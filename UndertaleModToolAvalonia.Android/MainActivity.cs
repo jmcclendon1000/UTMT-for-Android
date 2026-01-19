@@ -1,16 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Net;
 using Android.OS;
 using Android.Provider;
+using Android.Util;
 using Avalonia;
 using Avalonia.Android;
 using Avalonia.Maui;
 using Avalonia.Media;
 using Microsoft.Maui.ApplicationModel;
+using UndertaleModToolAvalonia.Android.NativeViews;
+using UndertaleModToolAvalonia.NativeViews;
 using UTMTdrid;
+using Environment = Android.OS.Environment;
+using Uri = Android.Net.Uri;
 
 namespace UndertaleModToolAvalonia.Android
 {
@@ -23,18 +28,27 @@ namespace UndertaleModToolAvalonia.Android
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.UiMode)]
     public class MainActivity : AvaloniaMainActivity<App>
     {
+        
         public const string Font = "avares://UndertaleModToolAvalonia/Assets/unifont.ttf#Unifont";
+
+        public MainActivity()
+        {
+            try
+            {
+                ISoraEditorAndroid.Implementation = new SoraEditorAndroid(this);
+            }
+            catch (Exception e)
+            {
+                Log.Error("ISoraEditorAndroid", e.Message);
+            }
+            
+        }
         protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
         {
-            //RequestPermissions(["android.permission.WRITE_EXTERNAL_STORAGE"],0);
-            //RequestFullscreenMode(FullscreenModeRequest.Enter, null);
-            //CheckExternalStoragePermission();
             Com.Kongzue.Dialogx.DialogX.Init(Application);
             MAUIBridge.AskDialog = Bindme.dAskDialog;
             MAUIBridge.InputDialog = Bindme.dInputDialog;
             MAUIBridge.HasRequiredStoragePermission = HasStoragePermission;
-            //MAUIBridge.AskDialog = async (title, message) => { return false; };
-            //MAUIBridge.InputDialog = async (title, message) => { return null; };
             return base.CustomizeAppBuilder(builder)
                 .UseMaui<MauiApplication>(this)
                 .With(new FontManagerOptions
